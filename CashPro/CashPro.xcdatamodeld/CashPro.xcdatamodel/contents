@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="22522" systemVersion="23A344" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Transaction" representedClassName="Transaction" syncable="YES" codeGenerationType="class">
+        <attribute name="amount" optional="NO" attributeType="Decimal" defaultValueString="0.0"/>
+        <attribute name="category" optional="NO" attributeType="String"/>
+        <attribute name="createdAt" optional="NO" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="createdBy" optional="NO" attributeType="String"/>
+        <attribute name="date" optional="NO" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="desc" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="NO" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="transactionId" optional="YES" attributeType="String"/>
+        <attribute name="type" optional="NO" attributeType="String"/>
+        <attribute name="vendor" optional="YES" attributeType="String"/>
+        <relationship name="account" optional="NO" maxCount="1" deletionRule="Nullify" destinationEntity="Account" inverseName="transactions" inverseEntity="Account"/>
+    </entity>
+    <entity name="Account" representedClassName="Account" syncable="YES" codeGenerationType="class">
+        <attribute name="id" optional="NO" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="name" optional="NO" attributeType="String"/>
+        <relationship name="transactions" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Transaction" inverseName="account" inverseEntity="Transaction"/>
+    </entity>
+    <entity name="Employee" representedClassName="Employee" syncable="YES" codeGenerationType="class">
+        <attribute name="designation" optional="YES" attributeType="String"/>
+        <attribute name="email" optional="YES" attributeType="String"/>
+        <attribute name="emiratesId" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="NO" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="joinDate" optional="NO" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="name" optional="NO" attributeType="String"/>
+        <attribute name="phone" optional="YES" attributeType="String"/>
+        <attribute name="photo" optional="YES" attributeType="Binary"/>
+        <attribute name="salary" optional="NO" attributeType="Decimal" defaultValueString="0.0"/>
+        <attribute name="visaExpiry" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="advances" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Advance" inverseName="employee" inverseEntity="Advance"/>
+        <relationship name="attendances" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Attendance" inverseName="employee" inverseEntity="Attendance"/>
+        <relationship name="payrolls" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Payroll" inverseName="employee" inverseEntity="Payroll"/>
+    </entity>
+    <entity name="User" representedClassName="User" syncable="YES" codeGenerationType="class">
+        <attribute name="id" optional="NO" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="password" optional="NO" attributeType="String"/>
+        <attribute name="role" optional="NO" attributeType="String"/>
+        <attribute name="username" optional="NO" attributeType="String"/>
+    </entity>
+    <entity name="Part" representedClassName="Part" syncable="YES" codeGenerationType="class">
+        <attribute name="customer" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="NO" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="partName" optional="NO" attributeType="String"/>
+        <attribute name="partNumber" optional="YES" attributeType="String"/>
+        <attribute name="price" optional="NO" attributeType="Decimal" defaultValueString="0.0"/>
+        <attribute name="quantity" optional="NO" attributeType="Integer 32" defaultValueString="0"/>
+        <attribute name="supplier" optional="YES" attributeType="String"/>
+        <attribute name="vehicle" optional="YES" attributeType="String"/>
+    </entity>
+    <entity name="Payroll" representedClassName="Payroll" syncable="YES" codeGenerationType="class">
+        <attribute name="allowances" optional="NO" attributeType="Decimal" defaultValueString="0.0"/>
+        <attribute name="basicSalary" optional="NO" attributeType="Decimal" defaultValueString="0.0"/>
+        <attribute name="deductions" optional="NO" attributeType="Decimal" defaultValueString="0.0"/>
+        <attribute name="id" optional="NO" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="month" optional="NO" attributeType="String"/>
+        <attribute name="netSalary" optional="NO" attributeType="Decimal" defaultValueString="0.0"/>
+        <attribute name="overtime" optional="NO" attributeType="Decimal" defaultValueString="0.0"/>
+        <attribute name="year" optional="NO" attributeType="Integer 32" defaultValueString="0"/>
+        <relationship name="employee" optional="NO" maxCount="1" deletionRule="Nullify" destinationEntity="Employee" inverseName="payrolls" inverseEntity="Employee"/>
+    </entity>
+    <entity name="Advance" representedClassName="Advance" syncable="YES" codeGenerationType="class">
+        <attribute name="amount" optional="NO" attributeType="Decimal" defaultValueString="0.0"/>
+        <attribute name="date" optional="NO" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="NO" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="reason" optional="YES" attributeType="String"/>
+        <attribute name="status" optional="NO" attributeType="String"/>
+        <relationship name="employee" optional="NO" maxCount="1" deletionRule="Nullify" destinationEntity="Employee" inverseName="advances" inverseEntity="Employee"/>
+    </entity>
+    <entity name="Attendance" representedClassName="Attendance" syncable="YES" codeGenerationType="class">
+        <attribute name="date" optional="NO" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="NO" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="status" optional="NO" attributeType="String"/>
+        <relationship name="employee" optional="NO" maxCount="1" deletionRule="Nullify" destinationEntity="Employee" inverseName="attendances" inverseEntity="Employee"/>
+    </entity>
+</model>
