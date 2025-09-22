@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="22522" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="MainTabBarController">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22510"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Main Tab Bar Controller-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <tabBarController storyboardIdentifier="MainTabBarController" id="MainTabBarController" customClass="MainTabBarController" customModule="CashPro" customModuleProvider="target" sceneMemberID="viewController">
+                    <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="W28-zg-YXA">
+                        <rect key="frame" x="0.0" y="975" width="768" height="49"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    </tabBar>
+                </tabBarController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="0.0" y="0.0"/>
+        </scene>
+        <!--Login View Controller-->
+        <scene sceneID="login-scene">
+            <objects>
+                <viewController storyboardIdentifier="LoginViewController" id="LoginViewController" customClass="LoginViewController" customModule="CashPro" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="login-view">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="card-view">
+                                <rect key="frame" x="40" y="276" width="313" height="300"/>
+                                <subviews>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="logo-image">
+                                        <rect key="frame" x="131.66666666666666" y="20" width="50" height="50"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="50" id="logo-width"/>
+                                            <constraint firstAttribute="height" constant="50" id="logo-height"/>
+                                        </constraints>
+                                    </imageView>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="CashPro" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="title-label">
+                                        <rect key="frame" x="20" y="80" width="273" height="34"/>
+                                        <fontDescription key="fontDescription" type="system" weight="heavy" pointSize="28"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Welcome to Esthetics Auto" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="subtitle-label">
+                                        <rect key="frame" x="20" y="124" width="273" height="19"/>
+                                        <fontDescription key="fontDescription" type="system" weight="medium" pointSize="16"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Username" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="username-field">
+                                        <rect key="frame" x="20" y="163" width="273" height="44"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="44" id="username-height"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                        <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" returnKeyType="next" smartDashesType="no" smartInsertDeleteType="no" smartQuotesType="no"/>
+                                    </textField>
+                                    <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Password" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="password-field">
+                                        <rect key="frame" x="20" y="217" width="273" height="44"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="44" id="password-height"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                        <textInputTraits key="textInputTraits" returnKeyType="done" secureTextEntry="YES" smartDashesType="no" smartInsertDeleteType="no" smartQuotesType="no"/>
+                                    </textField>
+                                </subviews>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstItem="logo-image" firstAttribute="centerX" secondItem="card-view" secondAttribute="centerX" id="logo-center-x"/>
+                                    <constraint firstItem="logo-image" firstAttribute="top" secondItem="card-view" secondAttribute="top" constant="20" id="logo-top"/>
+                                    <constraint firstItem="title-label" firstAttribute="top" secondItem="logo-image" secondAttribute="bottom" constant="10" id="title-top"/>
+                                    <constraint firstItem="title-label" firstAttribute="leading" secondItem="card-view" secondAttribute="leading" constant="20" id="title-leading"/>
+                                    <constraint firstAttribute="trailing" secondItem="title-label" secondAttribute="trailing" constant="20" id="title-trailing"/>
+                                    <constraint firstItem="subtitle-label" firstAttribute="top" secondItem="title-label" secondAttribute="bottom" constant="10" id="subtitle-top"/>
+                                    <constraint firstItem="subtitle-label" firstAttribute="leading" secondItem="card-view" secondAttribute="leading" constant="20" id="subtitle-leading"/>
+                                    <constraint firstAttribute="trailing" secondItem="subtitle-label" secondAttribute="trailing" constant="20" id="subtitle-trailing"/>
+                                    <constraint firstItem="username-field" firstAttribute="top" secondItem="subtitle-label" secondAttribute="bottom" constant="20" id="username-top"/>
+                                    <constraint firstItem="username-field" firstAttribute="leading" secondItem="card-view" secondAttribute="leading" constant="20" id="username-leading"/>
+                                    <constraint firstAttribute="trailing" secondItem="username-field" secondAttribute="trailing" constant="20" id="username-trailing"/>
+                                    <constraint firstItem="password-field" firstAttribute="top" secondItem="username-field" secondAttribute="bottom" constant="10" id="password-top"/>
+                                    <constraint firstItem="password-field" firstAttribute="leading" secondItem="card-view" secondAttribute="leading" constant="20" id="password-leading"/>
+                                    <constraint firstAttribute="trailing" secondItem="password-field" secondAttribute="trailing" constant="20" id="password-trailing"/>
+                                    <constraint firstAttribute="height" constant="300" id="card-height"/>
+                                </constraints>
+                            </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="login-button">
+                                <rect key="frame" x="40" y="596" width="313" height="50"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="50" id="login-button-height"/>
+                                </constraints>
+                                <state key="normal" title="Login"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Login">
+                                    <fontDescription key="titleFontDescription" type="system" weight="semibold" pointSize="18"/>
+                                </buttonConfiguration>
+                                <connections>
+                                    <action selector="loginButtonTapped:" destination="LoginViewController" eventType="touchUpInside" id="login-action"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="login-safe-area"/>
+                        <constraints>
+                            <constraint firstItem="card-view" firstAttribute="centerY" secondItem="login-view" secondAttribute="centerY" id="card-center-y"/>
+                            <constraint firstItem="card-view" firstAttribute="leading" secondItem="login-safe-area" secondAttribute="leading" constant="40" id="card-leading"/>
+                            <constraint firstItem="login-safe-area" firstAttribute="trailing" secondItem="card-view" secondAttribute="trailing" constant="40" id="card-trailing"/>
+                            <constraint firstItem="login-button" firstAttribute="top" secondItem="card-view" secondAttribute="bottom" constant="20" id="button-top"/>
+                            <constraint firstItem="login-button" firstAttribute="leading" secondItem="login-safe-area" secondAttribute="leading" constant="40" id="button-leading"/>
+                            <constraint firstItem="login-safe-area" firstAttribute="trailing" secondItem="login-button" secondAttribute="trailing" constant="40" id="button-trailing"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="cardView" destination="card-view" id="card-outlet"/>
+                        <outlet property="logoImageView" destination="logo-image" id="logo-outlet"/>
+                        <outlet property="loginButton" destination="login-button" id="login-button-outlet"/>
+                        <outlet property="passwordTextField" destination="password-field" id="password-outlet"/>
+                        <outlet property="subtitleLabel" destination="subtitle-label" id="subtitle-outlet"/>
+                        <outlet property="titleLabel" destination="title-label" id="title-outlet"/>
+                        <outlet property="usernameTextField" destination="username-field" id="username-outlet"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="login-responder" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1000" y="0"/>
+        </scene>
+        <!--Dashboard View Controller-->
+        <scene sceneID="dashboard-scene">
+            <objects>
+                <viewController storyboardIdentifier="DashboardViewController" id="DashboardViewController" customClass="DashboardViewController" customModule="CashPro" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="dashboard-view">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="scroll-view">
+                                <rect key="frame" x="0.0" y="103" width="393" height="666"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="content-view">
+                                        <rect key="frame" x="0.0" y="0.0" width="393" height="600"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Welcome, User" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="welcome-label">
+                                                <rect key="frame" x="20" y="20" width="353" height="22"/>
+                                                <fontDescription key="fontDescription" type="system" weight="medium" pointSize="18"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="AED 0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="balance-label">
+                                                <rect key="frame" x="20" y="62" width="353" height="38"/>
+                                                <fontDescription key="fontDescription" type="system" weight="heavy" pointSize="32"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="stats-stack">
+                                                <rect key="frame" x="20" y="120" width="353" height="50"/>
+                                                <subviews>
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="+ AED 0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="income-label">
+                                                        <rect key="frame" x="0.0" y="0.0" width="166.66666666666666" height="50"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                        <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="16"/>
+                                                        <nil key="textColor"/>
+                                                        <nil key="highlightedColor"/>
+                                                    </label>
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="- AED 0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="expense-label">
+                                                        <rect key="frame" x="186.66666666666663" y="0.0" width="166.33333333333337" height="50"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                        <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="16"/>
+                                                        <nil key="textColor"/>
+                                                        <nil key="highlightedColor"/>
+                                                    </label>
+                                                </subviews>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="50" id="stats-height"/>
+                                                </constraints>
+                                            </stackView>
+                                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="NO" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="transactions-table">
+                                                <rect key="frame" x="20" y="190" width="353" height="390"/>
+                                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                            </tableView>
+                                        </subviews>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                        <constraints>
+                                            <constraint firstItem="welcome-label" firstAttribute="top" secondItem="content-view" secondAttribute="top" constant="20" id="welcome-top"/>
+                                            <constraint firstItem="welcome-label" firstAttribute="leading" secondItem="content-view" secondAttribute="leading" constant="20" id="welcome-leading"/>
+                                            <constraint firstAttribute="trailing" secondItem="welcome-label" secondAttribute="trailing" constant="20" id="welcome-trailing"/>
+                                            <constraint firstItem="balance-label" firstAttribute="top" secondItem="welcome-label" secondAttribute="bottom" constant="20" id="balance-top"/>
+                                            <constraint firstItem="balance-label" firstAttribute="leading" secondItem="content-view" secondAttribute="leading" constant="20" id="balance-leading"/>
+                                            <constraint firstAttribute="trailing" secondItem="balance-label" secondAttribute="trailing" constant="20" id="balance-trailing"/>
+                                            <constraint firstItem="stats-stack" firstAttribute="top" secondItem="balance-label" secondAttribute="bottom" constant="20" id="stats-top"/>
+                                            <constraint firstItem="stats-stack" firstAttribute="leading" secondItem="content-view" secondAttribute="leading" constant="20" id="stats-leading"/>
+                                            <constraint firstAttribute="trailing" secondItem="stats-stack" secondAttribute="trailing" constant="20" id="stats-trailing"/>
+                                            <constraint firstItem="transactions-table" firstAttribute="top" secondItem="stats-stack" secondAttribute="bottom" constant="20" id="table-top"/>
+                                            <constraint firstItem="transactions-table" firstAttribute="leading" secondItem="content-view" secondAttribute="leading" constant="20" id="table-leading"/>
+                                            <constraint firstAttribute="trailing" secondItem="transactions-table" secondAttribute="trailing" constant="20" id="table-trailing"/>
+                                            <constraint firstAttribute="bottom" secondItem="transactions-table" secondAttribute="bottom" constant="20" id="table-bottom"/>
+                                            <constraint firstAttribute="height" constant="600" id="content-height"/>
+                                        </constraints>
+                                    </view>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="content-view" firstAttribute="top" secondItem="scroll-view" secondAttribute="top" id="content-top"/>
+                                    <constraint firstItem="content-view" firstAttribute="leading" secondItem="scroll-view" secondAttribute="leading" id="content-leading"/>
+                                    <constraint firstAttribute="trailing" secondItem="content-view" secondAttribute="trailing" id="content-trailing"/>
+                                    <constraint firstAttribute="bottom" secondItem="content-view" secondAttribute="bottom" id="content-bottom"/>
+                                    <constraint firstItem="content-view" firstAttribute="width" secondItem="scroll-view" secondAttribute="width" id="content-width"/>
+                                </constraints>
+                            </scrollView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="dashboard-safe-area"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="scroll-view" firstAttribute="top" secondItem="dashboard-safe-area" secondAttribute="top" id="scroll-top"/>
+                            <constraint firstItem="scroll-view" firstAttribute="leading" secondItem="dashboard-safe-area" secondAttribute="leading" id="scroll-leading"/>
+                            <constraint firstItem="dashboard-safe-area" firstAttribute="trailing" secondItem="scroll-view" secondAttribute="trailing" id="scroll-trailing"/>
+                            <constraint firstItem="dashboard-safe-area" firstAttribute="bottom" secondItem="scroll-view" secondAttribute="bottom" id="scroll-bottom"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="contentView" destination="content-view" id="content-outlet"/>
+                        <outlet property="recentTransactionsTableView" destination="transactions-table" id="table-outlet"/>
+                        <outlet property="scrollView" destination="scroll-view" id="scroll-outlet"/>
+                        <outlet property="tableViewHeightConstraint" destination="content-height" id="height-outlet"/>
+                        <outlet property="todayExpenseLabel" destination="expense-label" id="expense-outlet"/>
+                        <outlet property="todayIncomeLabel" destination="income-label" id="income-outlet"/>
+                        <outlet property="totalBalanceLabel" destination="balance-label" id="balance-outlet"/>
+                        <outlet property="welcomeLabel" destination="welcome-label" id="welcome-outlet"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dashboard-responder" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2000" y="0"/>
+        </scene>
+        <!--Transactions View Controller-->
+        <scene sceneID="transactions-scene">
+            <objects>
+                <viewController storyboardIdentifier="TransactionsViewController" id="TransactionsViewController" customClass="TransactionsViewController" customModule="CashPro" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="transactions-view">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="transactions-table-view">
+                                <rect key="frame" x="0.0" y="103" width="393" height="666"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                            </tableView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="transactions-safe-area"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="transactions-table-view" firstAttribute="top" secondItem="transactions-safe-area" secondAttribute="top" id="transactions-table-top"/>
+                            <constraint firstItem="transactions-table-view" firstAttribute="leading" secondItem="transactions-safe-area" secondAttribute="leading" id="transactions-table-leading"/>
+                            <constraint firstItem="transactions-safe-area" firstAttribute="trailing" secondItem="transactions-table-view" secondAttribute="trailing" id="transactions-table-trailing"/>
+                            <constraint firstItem="transactions-safe-area" firstAttribute="bottom" secondItem="transactions-table-view" secondAttribute="bottom" id="transactions-table-bottom"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="tableView" destination="transactions-table-view" id="transactions-table-outlet"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="transactions-responder" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3000" y="0"/>
+        </scene>
+        <!--Employees View Controller-->
+        <scene sceneID="employees-scene">
+            <objects>
+                <viewController storyboardIdentifier="EmployeesViewController" id="EmployeesViewController" customClass="EmployeesViewController" customModule="CashPro" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="employees-view">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="employees-table-view">
+                                <rect key="frame" x="0.0" y="103" width="393" height="666"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                            </tableView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="employees-safe-area"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="employees-table-view" firstAttribute="top" secondItem="employees-safe-area" secondAttribute="top" id="employees-table-top"/>
+                            <constraint firstItem="employees-table-view" firstAttribute="leading" secondItem="employees-safe-area" secondAttribute="leading" id="employees-table-leading"/>
+                            <constraint firstItem="employees-safe-area" firstAttribute="trailing" secondItem="employees-table-view" secondAttribute="trailing" id="employees-table-trailing"/>
+                            <constraint firstItem="employees-safe-area" firstAttribute="bottom" secondItem="employees-table-view" secondAttribute="bottom" id="employees-table-bottom"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="tableView" destination="employees-table-view" id="employees-table-outlet"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="employees-responder" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="4000" y="0"/>
+        </scene>
+        <!--Parts View Controller-->
+        <scene sceneID="parts-scene">
+            <objects>
+                <viewController storyboardIdentifier="PartsViewController" id="PartsViewController" customClass="PartsViewController" customModule="CashPro" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="parts-view">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="parts-table-view">
+                                <rect key="frame" x="0.0" y="103" width="393" height="666"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                            </tableView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="parts-safe-area"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="parts-table-view" firstAttribute="top" secondItem="parts-safe-area" secondAttribute="top" id="parts-table-top"/>
+                            <constraint firstItem="parts-table-view" firstAttribute="leading" secondItem="parts-safe-area" secondAttribute="leading" id="parts-table-leading"/>
+                            <constraint firstItem="parts-safe-area" firstAttribute="trailing" secondItem="parts-table-view" secondAttribute="trailing" id="parts-table-trailing"/>
+                            <constraint firstItem="parts-safe-area" firstAttribute="bottom" secondItem="parts-table-view" secondAttribute="bottom" id="parts-table-bottom"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="tableView" destination="parts-table-view" id="parts-table-outlet"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="parts-responder" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="5000" y="0"/>
+        </scene>
+        <!--Settings View Controller-->
+        <scene sceneID="settings-scene">
+            <objects>
+                <viewController storyboardIdentifier="SettingsViewController" id="SettingsViewController" customClass="SettingsViewController" customModule="CashPro" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="settings-view">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" estimatedSectionHeaderHeight="-1" sectionFooterHeight="18" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="settings-table-view">
+                                <rect key="frame" x="0.0" y="103" width="393" height="666"/>
+                                <color key="backgroundColor" systemColor="groupTableViewBackgroundColor"/>
+                            </tableView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="settings-safe-area"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="settings-table-view" firstAttribute="top" secondItem="settings-safe-area" secondAttribute="top" id="settings-table-top"/>
+                            <constraint firstItem="settings-table-view" firstAttribute="leading" secondItem="settings-safe-area" secondAttribute="leading" id="settings-table-leading"/>
+                            <constraint firstItem="settings-safe-area" firstAttribute="trailing" secondItem="settings-table-view" secondAttribute="trailing" id="settings-table-trailing"/>
+                            <constraint firstItem="settings-safe-area" firstAttribute="bottom" secondItem="settings-table-view" secondAttribute="bottom" id="settings-table-bottom"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="tableView" destination="settings-table-view" id="settings-table-outlet"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="settings-responder" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="6000" y="0"/>
+        </scene>
+    </scenes>
+    <resources>
+        <systemColor name="groupTableViewBackgroundColor">
+            <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>
