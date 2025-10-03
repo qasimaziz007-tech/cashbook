@@ -5170,28 +5170,64 @@ function _asYMD(dstr){
   return dstr;
 }
 </script>
-<script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyAO-ya0lOy48D0ngzmslCgdG0-THCKwSgw",
-    authDomain: "esthetics-cashbook.firebaseapp.com",
-    projectId: "esthetics-cashbook",
-    storageBucket: "esthetics-cashbook.firebasestorage.app",
-    messagingSenderId: "329257216321",
-    appId: "1:329257216321:web:58309e53914ba8daa9d9c0",
-    measurementId: "G-TY4JFLB6BB"
-  };
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
+  <!-- ✅ Firebase + Firestore (Injected) -->
+  <script type="module">
+    import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-analytics.js";
+    import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBl4tyLgSNOWBEXPJghnrIxmetfX9SsscY",
+      authDomain: "qasim-cashbook.firebaseapp.com",
+      projectId: "qasim-cashbook",
+      storageBucket: "qasim-cashbook.appspot.com",
+      messagingSenderId: "46440516489",
+      appId: "1:46440516489:web:33c2134a476315bb4cef58",
+      measurementId: "G-0826BND5WP"
+    };
+
+    // Initialize (avoid re-init if already initialized)
+    const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+    try { getAnalytics(app); } catch(e) { /* analytics may require secure origin */ }
+
+    // Firestore instance
+    const db = getFirestore(app);
+    window.qasimDB = db; // optional: expose for console testing
+
+    // --- Demo helpers ---
+    async function addTransactionDemo(){
+      try{
+        const docRef = await addDoc(collection(db, "transactions"), {
+          date: new Date().toISOString().slice(0,10), // YYYY-MM-DD
+          category: "Fuel",
+          vendor: "ENOC",
+          account: "Cash",
+          amount: 150,
+          description: "Petrol refill (demo)",
+          type: "expense"
+        });
+        console.log("✅ Added demo transaction id:", docRef.id);
+      }catch(e){
+        console.error("❌ Add demo transaction failed:", e);
+      }
+    }
+
+    async function listTransactionsDemo(){
+      try{
+        const snap = await getDocs(collection(db, "transactions"));
+        console.log(`📄 ${snap.size} docs in 'transactions':`);
+        snap.forEach(d => console.log(d.id, "=>", d.data()));
+      }catch(e){
+        console.error("❌ Fetch transactions failed:", e);
+      }
+    }
+
+    // Auto-run once for smoke test (comment out if not needed)
+    addTransactionDemo().then(listTransactionsDemo);
+  </script>
+
 </body>
 </html>
