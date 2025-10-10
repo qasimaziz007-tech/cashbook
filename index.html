@@ -280,26 +280,13 @@ header nav button.active {
   font-size: 15px;
 }
 
-/* Sync icon animation */
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
 
-#syncIndicator {
-  transition: all 0.3s ease;
-}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 <header>
-<div class="title">
-<i class="fa-solid fa-car"></i> Esthetics Auto CashBook
-<span id="syncIndicator" style="margin-left: 15px; font-size: 12px; opacity: 0.8;" title="Auto-sync status">
-<i class="fa-solid fa-sync" style="animation: none;"></i> <span id="syncStatusText">Syncing...</span>
-</span>
-</div>
+<div class="title"><i class="fa-solid fa-car"></i> Esthetics Auto CashBook</div>
 <nav class="hidden" id="menu">
 <button id="btnDashboard" onclick="showSection('dashboard'); try{loadDashboardTransactions()}catch(e){}">Dashboard</button>
 <button class="active" id="btnTransactions" onclick="showSection('transactions')">Transactions</button>
@@ -775,69 +762,12 @@ header nav button.active {
 </table>
 </div>
 </div>
-<!-- Data Sync -->
+<!-- Simple Data Sharing -->
 <div class="card" style="margin-top:10px;">
-<div class="card-title"><i class="fa-solid fa-cloud"></i> Automatic Data Sync</div>
-<div style="background: linear-gradient(45deg, #16a34a, #059669); color: white; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-<h4><i class="fa-solid fa-sync"></i> Auto-Sync Status</h4>
-<p style="margin: 5px 0; font-size: 14px;">Your data automatically syncs across devices every 30 seconds</p>
-<div style="margin-top: 10px;">
-<span id="syncStatus" style="font-weight: bold;">🟢 Auto-Sync Active</span>
-<span id="lastSyncTime" style="margin-left: 15px; font-size: 12px;"></span>
-</div>
-</div>
-
-<!-- Auto-Sync Settings -->
-<div class="form-row">
-<div class="form-group">
-<label>Auto-Sync</label>
-<div style="display: flex; align-items: center; gap: 10px;">
-<button id="autoSyncToggle" class="btn btn-success" onclick="toggleAutoSync()">
-<i class="fa-solid fa-power-off"></i> <span id="autoSyncText">Turn Off Auto-Sync</span>
-</button>
-<select id="syncInterval" class="standard-field" onchange="updateSyncInterval()" style="max-width: 150px;">
-<option value="30">Every 30 seconds</option>
-<option value="60">Every 1 minute</option>
-<option value="300">Every 5 minutes</option>
-<option value="600">Every 10 minutes</option>
-</select>
-</div>
-</div>
-</div>
-
-<!-- Manual Sync Options -->
-<div style="background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-<h4><i class="fa-solid fa-hand"></i> Manual Sync Options</h4>
-<p style="margin: 5px 0; font-size: 14px;">Use these for one-time sharing or backup</p>
-</div>
-<div class="form-row">
-<div class="form-group">
-<label>Share Data with Other Devices</label>
-<button class="btn btn-success" onclick="generateShareableLink()"><i class="fa-solid fa-share"></i> Generate Shareable Data Link</button>
-</div>
-<div class="form-group">
-<label>Quick Sync Code</label>
-<button class="btn btn-primary" onclick="generateSyncCode()"><i class="fa-solid fa-qrcode"></i> Generate 6-Digit Sync Code</button>
-</div>
-</div>
-<div class="form-row">
-<div class="form-group">
-<label>Import from Sync Code</label>
-<input class="standard-field" id="syncCodeInput" placeholder="Enter 6-digit code" maxlength="6"/>
-</div>
-<div class="form-group" style="align-self:end;">
-<button class="btn btn-warning" onclick="importFromSyncCode()"><i class="fa-solid fa-download"></i> Import Data</button>
-</div>
-</div>
-<div id="syncCodeDisplay" style="display:none; background: rgba(34, 197, 94, 0.1); padding: 15px; border-radius: 8px; margin: 10px 0;">
-<h4>Your Sync Code:</h4>
-<div style="font-size: 36px; font-weight: bold; color: #059669; text-align: center; margin: 15px 0; letter-spacing: 3px;" id="displayedSyncCode"></div>
-<div style="text-align: center; margin: 15px 0;">
-<button class="btn btn-secondary" onclick="copySyncCode()"><i class="fa-solid fa-copy"></i> Copy Code</button>
-<button class="btn btn-primary" onclick="generateQRCode()"><i class="fa-solid fa-qrcode"></i> Show QR Code</button>
-</div>
-<div id="qrCodeContainer" style="display:none; text-align: center; margin: 15px 0;"></div>
-<p style="font-size: 12px; color: #6b7280; text-align: center;">Share this code with other devices. Valid for same browser session.</p>
+<div class="card-title"><i class="fa-solid fa-share-nodes"></i> Share Data Between Devices</div>
+<div style="background: linear-gradient(45deg, #3b82f6, #1d4ed8); color: white; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+<h4><i class="fa-solid fa-info-circle"></i> Simple & Reliable Data Sharing</h4>
+<p style="margin: 5px 0; font-size: 14px;">Use backup files to easily share your data between any devices</p>
 </div>
 </div>
 
@@ -3393,11 +3323,6 @@ document.getElementById('transactionForm').addEventListener('submit', function(e
   LS.set('transactions', state.transactions);
   saveNativeSnapshot();
   
-  // Trigger auto-sync immediately after adding transaction
-  if (autoSyncEnabled) {
-    setTimeout(performAutoSync, 1000);
-  }
-  
   // Local storage only - no cloud sync
   
   // Removed the alert message
@@ -4084,11 +4009,6 @@ document.getElementById('employeeForm').addEventListener('submit', function(e) {
 function saveEmployee(employee) {
   state.employees.push(employee);
   LS.set('employees', state.employees);
-  
-  // Trigger auto-sync
-  if (autoSyncEnabled) {
-    setTimeout(performAutoSync, 1000);
-  }
   
   showTransactionToast('Employee saved successfully!');
   resetEmployeeForm();
@@ -4897,21 +4817,9 @@ function deletePayroll(index) {
   }
 }
 
-/* ---------- Automatic Cross-Device Data Sync ---------- */
+/* ---------- Simple Data Sharing ---------- */
 
-// Auto-sync configuration
-let autoSyncEnabled = LS.get('autoSyncEnabled', true);
-let syncInterval = LS.get('syncInterval', 30); // seconds
-let syncTimer = null;
-let lastSyncHash = '';
-let syncId = LS.get('syncId', generateSyncId());
 
-// Generate unique sync ID for this device/browser
-function generateSyncId() {
-  const id = 'sync_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
-  LS.set('syncId', id);
-  return id;
-}
 
 // Cloud storage using browser's broadcast channel for same-origin sync
 const syncChannel = new BroadcastChannel('esthetics_auto_sync');
@@ -5840,15 +5748,7 @@ function initializeApp() {
       }
     });
     
-    // Initialize auto-sync
-    setTimeout(() => {
-      initializeAutoSync();
-    }, 2000);
-    
-    // Check for shared data in URL
-    setTimeout(() => {
-      checkForImportData();
-    }, 1000);
+    // No auto-sync - keeping it simple and reliable
     
     console.log('App initialization completed successfully');
   } catch (error) {
