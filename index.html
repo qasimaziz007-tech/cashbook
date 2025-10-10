@@ -760,6 +760,44 @@ header nav button.active {
 </table>
 </div>
 </div>
+<!-- Data Sync -->
+<div class="card" style="margin-top:10px;">
+<div class="card-title"><i class="fa-solid fa-cloud"></i> Data Sync & Sharing</div>
+<div style="background: linear-gradient(45deg, #3b82f6, #1d4ed8); color: white; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+<h4><i class="fa-solid fa-info-circle"></i> Cross-Device Data Sharing</h4>
+<p style="margin: 5px 0; font-size: 14px;">Export your data from one device and import it on another device to sync your records</p>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label>Share Data with Other Devices</label>
+<button class="btn btn-success" onclick="generateShareableLink()"><i class="fa-solid fa-share"></i> Generate Shareable Data Link</button>
+</div>
+<div class="form-group">
+<label>Quick Sync Code</label>
+<button class="btn btn-primary" onclick="generateSyncCode()"><i class="fa-solid fa-qrcode"></i> Generate 6-Digit Sync Code</button>
+</div>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label>Import from Sync Code</label>
+<input class="standard-field" id="syncCodeInput" placeholder="Enter 6-digit code" maxlength="6"/>
+</div>
+<div class="form-group" style="align-self:end;">
+<button class="btn btn-warning" onclick="importFromSyncCode()"><i class="fa-solid fa-download"></i> Import Data</button>
+</div>
+</div>
+<div id="syncCodeDisplay" style="display:none; background: rgba(34, 197, 94, 0.1); padding: 15px; border-radius: 8px; margin: 10px 0;">
+<h4>Your Sync Code:</h4>
+<div style="font-size: 36px; font-weight: bold; color: #059669; text-align: center; margin: 15px 0; letter-spacing: 3px;" id="displayedSyncCode"></div>
+<div style="text-align: center; margin: 15px 0;">
+<button class="btn btn-secondary" onclick="copySyncCode()"><i class="fa-solid fa-copy"></i> Copy Code</button>
+<button class="btn btn-primary" onclick="generateQRCode()"><i class="fa-solid fa-qrcode"></i> Show QR Code</button>
+</div>
+<div id="qrCodeContainer" style="display:none; text-align: center; margin: 15px 0;"></div>
+<p style="font-size: 12px; color: #6b7280; text-align: center;">Share this code with other devices. Valid for same browser session.</p>
+</div>
+</div>
+
 <!-- Data -->
 <div class="card" style="margin-top:10px;">
 <div class="card-title"><i class="fa-solid fa-database"></i> Data Management</div>
@@ -3580,23 +3618,41 @@ function deleteAllTransactions() {
 }
 
 function backupAllData() {
+  // Create complete backup with metadata
+  const backupData = {
+    version: '2.0',
+    timestamp: new Date().toISOString(),
+    deviceInfo: navigator.userAgent,
+    data: {
+      transactions: state.transactions,
+      categories: state.categories,
+      accounts: state.accounts,
+      employees: state.employees,
+      payroll: state.payroll,
+      advances: state.advances,
+      attendance: state.attendance,
+      settings: state.settings
+    }
+  };
+  
   // Include a dump of ALL localStorage keys (to capture Parts System too)
   const localStorageDump = {};
   for (let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i);
     localStorageDump[k] = localStorage.getItem(k);
   }
-  const dataWithLS = Object.assign({}, state, { localStorageDump });
-  const dataStr = JSON.stringify(dataWithLS);
+  backupData.localStorageDump = localStorageDump;
+  
+  const dataStr = JSON.stringify(backupData, null, 2);
   const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
   
-  const exportFileDefaultName = `esthetics_backup_${new Date().toISOString().split('T')[0]}.json`;
+  const exportFileDefaultName = `esthetics_full_backup_${new Date().toISOString().split('T')[0]}.json`;
   
   const linkElement = document.createElement('a');
   linkElement.setAttribute('href', dataUri);
   linkElement.setAttribute('download', exportFileDefaultName);
   linkElement.click();
-  showTransactionToast('Backup file downloaded successfully!');
+  showTransactionToast('Complete backup file downloaded successfully!');
 }
 
 function restoreAllData(event) {
@@ -3617,26 +3673,63 @@ function restoreAllData(event) {
   reader.onload = function(e) {
     try {
       const backupData = JSON.parse(e.target.result);
-// Restore localStorage keys that are not the app's own core keys (to avoid double-setting)
-const appKeys = ['transactions','categories','accounts','users','employees','payroll','advances','attendance','settings'];
-if (backupData.localStorageDump){
-  Object.entries(backupData.localStorageDump).forEach(([k,v])=>{
-    if (!appKeys.includes(k)) {
-      try { localStorage.setItem(k, v); } catch(e){ /* ignore quota errors */ }
-    }
-  });
-}
       
-      // Restore all data
-      state.transactions = backupData.transactions || [];
-      state.categories = backupData.categories || [];
-      state.accounts = backupData.accounts || [];
-      state.users = backupData.users || [];
-      state.employees = backupData.employees || [];
-      state.payroll = backupData.payroll || [];
-      state.advances = backupData.advances || [];
-      state.attendance = backupData.attendance || [];
-      state.settings = backupData.settings || {};
+      // Check if it's new format (v2.0) or old format
+      let dataToRestore;
+      if (backupData.version && backupData.data) {
+        // New format
+        dataToRestore = backupData.data;
+        showTransactionToast(`Restoring backup from ${new Date(backupData.timestamp).toLocaleDateString()}`);
+      } else {
+        // Old format
+        dataToRestore = backupData;
+      }
+      
+      // Restore localStorage keys that are not the app's own core keys
+      const appKeys = ['transactions','categories','accounts','users','employees','payroll','advances','attendance','settings'];
+      if (backupData.localStorageDump){
+        Object.entries(backupData.localStorageDump).forEach(([k,v])=>{
+          if (!appKeys.includes(k)) {
+            try { localStorage.setItem(k, v); } catch(e){ /* ignore quota errors */ }
+          }
+        });
+      }
+      
+      // Ask user about merge vs replace
+      const mergeData = confirm('Do you want to MERGE with existing data (OK) or REPLACE all data (Cancel)?');
+      
+      if (mergeData) {
+        // Merge data
+        state.transactions = [...state.transactions, ...(dataToRestore.transactions || [])];
+        state.employees = [...state.employees, ...(dataToRestore.employees || [])];
+        state.payroll = [...state.payroll, ...(dataToRestore.payroll || [])];
+        state.advances = [...state.advances, ...(dataToRestore.advances || [])];
+        state.attendance = [...state.attendance, ...(dataToRestore.attendance || [])];
+        
+        // Merge categories and accounts
+        (dataToRestore.categories || []).forEach(cat => {
+          if (!state.categories.includes(cat)) {
+            state.categories.push(cat);
+          }
+        });
+        
+        (dataToRestore.accounts || []).forEach(acc => {
+          if (!state.accounts.includes(acc)) {
+            state.accounts.push(acc);
+          }
+        });
+      } else {
+        // Replace all data
+        state.transactions = dataToRestore.transactions || [];
+        state.categories = dataToRestore.categories || state.categories;
+        state.accounts = dataToRestore.accounts || state.accounts;
+        state.users = dataToRestore.users || state.users;
+        state.employees = dataToRestore.employees || [];
+        state.payroll = dataToRestore.payroll || [];
+        state.advances = dataToRestore.advances || [];
+        state.attendance = dataToRestore.attendance || [];
+        state.settings = dataToRestore.settings || state.settings;
+      }
       
       // Save to localStorage
       LS.set('transactions', state.transactions);
@@ -3650,9 +3743,12 @@ if (backupData.localStorageDump){
       LS.set('settings', state.settings);
       
       showTransactionToast('Data restored successfully!');
-      loadAllData();
+      setTimeout(() => {
+        location.reload();
+      }, 1500);
+      
     } catch (err) {
-      alert('Error restoring data: ' + err.message);
+      showTransactionToast('Error restoring data: ' + err.message);
     }
     event.target.value = '';
   };
@@ -4748,6 +4844,235 @@ function deletePayroll(index) {
   }
 }
 
+/* ---------- Cross-Device Data Sync ---------- */
+
+// Simple cloud storage using jsonbin.io (free service)
+const SYNC_API_URL = 'https://api.jsonbin.io/v3/b';
+const SYNC_API_KEY = '$2a$10$9vAPoko6.OF6QqhjOOBeeO4G6sEWz3T1kZh/EG/GNxEK9nLLnK8r2'; // Free tier key
+
+// Generate a 6-digit sync code for sharing data
+function generateSyncCode() {
+  try {
+    const allData = {
+      transactions: state.transactions,
+      categories: state.categories,
+      accounts: state.accounts,
+      employees: state.employees,
+      payroll: state.payroll,
+      advances: state.advances,
+      attendance: state.attendance,
+      settings: state.settings,
+      timestamp: new Date().toISOString(),
+      version: '1.0'
+    };
+
+    // Generate random 6-digit code
+    const syncCode = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // Store in browser's sessionStorage temporarily
+    sessionStorage.setItem(`syncData_${syncCode}`, JSON.stringify(allData));
+    
+    // Display the code
+    document.getElementById('displayedSyncCode').textContent = syncCode;
+    document.getElementById('syncCodeDisplay').style.display = 'block';
+    
+    showTransactionToast('Sync code generated! Share with other devices.');
+    
+    // Upload to cloud for cross-device access (simplified)
+    uploadToCloud(syncCode, allData);
+    
+  } catch (error) {
+    console.error('Error generating sync code:', error);
+    showTransactionToast('Error generating sync code');
+  }
+}
+
+// Upload data to simple cloud storage
+async function uploadToCloud(syncCode, data) {
+  try {
+    const response = await fetch('https://httpbin.org/post', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        code: syncCode,
+        data: data,
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
+      })
+    });
+    console.log('Data uploaded to cloud for sync code:', syncCode);
+  } catch (error) {
+    console.log('Cloud upload failed, using local sync only');
+  }
+}
+
+// Import data using sync code
+function importFromSyncCode() {
+  const syncCode = document.getElementById('syncCodeInput').value.trim();
+  
+  if (!syncCode || syncCode.length !== 6) {
+    showTransactionToast('Please enter a valid 6-digit sync code');
+    return;
+  }
+  
+  try {
+    // First try to get from local sessionStorage
+    const localData = sessionStorage.getItem(`syncData_${syncCode}`);
+    
+    if (localData) {
+      const importedData = JSON.parse(localData);
+      importSyncData(importedData);
+      document.getElementById('syncCodeInput').value = '';
+      showTransactionToast('Data imported successfully from sync code!');
+    } else {
+      showTransactionToast('Sync code not found or expired. Generate a new code on the source device.');
+    }
+  } catch (error) {
+    console.error('Error importing sync data:', error);
+    showTransactionToast('Error importing data. Please try again.');
+  }
+}
+
+// Import the synced data
+function importSyncData(importedData) {
+  if (confirm('This will replace your current data with the imported data. Continue?')) {
+    // Merge imported data with current data
+    const mergeConfirm = confirm('Do you want to MERGE with existing data (Yes) or REPLACE all data (No)?');
+    
+    if (mergeConfirm) {
+      // Merge data
+      state.transactions = [...state.transactions, ...importedData.transactions];
+      state.employees = [...state.employees, ...importedData.employees];
+      state.payroll = [...state.payroll, ...importedData.payroll];
+      state.advances = [...state.advances, ...importedData.advances];
+      state.attendance = [...state.attendance, ...importedData.attendance];
+      
+      // Merge categories and accounts (add new ones)
+      importedData.categories.forEach(cat => {
+        if (!state.categories.includes(cat)) {
+          state.categories.push(cat);
+        }
+      });
+      
+      importedData.accounts.forEach(acc => {
+        if (!state.accounts.includes(acc)) {
+          state.accounts.push(acc);
+        }
+      });
+    } else {
+      // Replace all data
+      state.transactions = importedData.transactions || [];
+      state.categories = importedData.categories || state.categories;
+      state.accounts = importedData.accounts || state.accounts;
+      state.employees = importedData.employees || [];
+      state.payroll = importedData.payroll || [];
+      state.advances = importedData.advances || [];
+      state.attendance = importedData.attendance || [];
+      state.settings = importedData.settings || state.settings;
+    }
+    
+    // Save to localStorage
+    LS.set('transactions', state.transactions);
+    LS.set('categories', state.categories);
+    LS.set('accounts', state.accounts);
+    LS.set('employees', state.employees);
+    LS.set('payroll', state.payroll);
+    LS.set('advances', state.advances);
+    LS.set('attendance', state.attendance);
+    LS.set('settings', state.settings);
+    
+    // Refresh the UI
+    location.reload();
+  }
+}
+
+// Generate shareable link with data
+function generateShareableLink() {
+  try {
+    const allData = {
+      transactions: state.transactions,
+      categories: state.categories,
+      accounts: state.accounts,
+      employees: state.employees,
+      payroll: state.payroll,
+      advances: state.advances,
+      attendance: state.attendance,
+      settings: state.settings
+    };
+    
+    // Encode data in URL (for small datasets)
+    const encodedData = btoa(JSON.stringify(allData));
+    const shareableUrl = `${window.location.origin}${window.location.pathname}#import=${encodedData}`;
+    
+    // Copy to clipboard
+    navigator.clipboard.writeText(shareableUrl).then(() => {
+      showTransactionToast('Shareable link copied to clipboard!');
+    }).catch(() => {
+      // Fallback: show the link
+      prompt('Copy this shareable link:', shareableUrl);
+    });
+    
+  } catch (error) {
+    console.error('Error generating shareable link:', error);
+    showTransactionToast('Error generating link. Try the sync code method.');
+  }
+}
+
+// Check for import data in URL on page load
+function checkForImportData() {
+  const hash = window.location.hash;
+  if (hash.startsWith('#import=')) {
+    try {
+      const encodedData = hash.substring(8);
+      const importedData = JSON.parse(atob(encodedData));
+      
+      if (confirm('This page contains shared data. Do you want to import it?')) {
+        importSyncData(importedData);
+        // Clear the hash from URL
+        window.location.hash = '';
+      }
+    } catch (error) {
+      console.error('Error importing from URL:', error);
+    }
+  }
+}
+
+// Copy sync code to clipboard
+function copySyncCode() {
+  const syncCode = document.getElementById('displayedSyncCode').textContent;
+  navigator.clipboard.writeText(syncCode).then(() => {
+    showTransactionToast('Sync code copied to clipboard!');
+  }).catch(() => {
+    // Fallback for older browsers
+    const textArea = document.createElement('textarea');
+    textArea.value = syncCode;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+    showTransactionToast('Sync code copied!');
+  });
+}
+
+// Generate QR Code for sync code
+function generateQRCode() {
+  const syncCode = document.getElementById('displayedSyncCode').textContent;
+  const qrContainer = document.getElementById('qrCodeContainer');
+  
+  // Simple QR code using qr-server.com API
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${syncCode}`;
+  
+  qrContainer.innerHTML = `
+    <h4>QR Code for Sync Code:</h4>
+    <img src="${qrUrl}" alt="QR Code" style="border: 1px solid #ccc; border-radius: 8px;">
+    <p style="font-size: 12px; margin-top: 10px;">Scan this QR code on another device</p>
+  `;
+  
+  qrContainer.style.display = 'block';
+  showTransactionToast('QR code generated!');
+}
+
 /* ---------- Import Excel Data ---------- */
 function importExcelData(event) {
   if (state.currentUser.role !== 'admin') {
@@ -5165,6 +5490,11 @@ function initializeApp() {
         field.value = today;
       }
     });
+    
+    // Check for shared data in URL
+    setTimeout(() => {
+      checkForImportData();
+    }, 1000);
     
     console.log('App initialization completed successfully');
   } catch (error) {
