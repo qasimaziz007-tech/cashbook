@@ -4942,12 +4942,60 @@ function loadAccounts() {
   }
 }
 
+// Initialize with sample data for demo purposes
+function initializeWithSampleData() {
+  // Only initialize if no data exists
+  if (state.transactions.length === 0) {
+    // Add sample transactions for demo
+    const sampleTransactions = [
+      {
+        date: '2025-10-10',
+        category: 'Vehicle',
+        transactionId: 'DXB-001',
+        vendor: 'Dubai Motors',
+        account: 'Cash',
+        amount: 15000,
+        description: 'Vehicle service and parts',
+        type: 'expense',
+        createdAt: new Date().toISOString(),
+        createdBy: 'admin'
+      },
+      {
+        date: '2025-10-09',
+        category: 'Parts',
+        transactionId: 'PRT-001',
+        vendor: 'Auto Parts LLC',
+        account: 'Bank Account',
+        amount: 2500,
+        description: 'Engine oil and filters',
+        type: 'expense',
+        createdAt: new Date().toISOString(),
+        createdBy: 'admin'
+      },
+      {
+        date: '2025-10-08',
+        category: 'Vehicle',
+        transactionId: 'SHJ-002',
+        vendor: 'Sharjah Service Center',
+        account: 'Cash',
+        amount: 25000,
+        description: 'Customer payment for vehicle repair',
+        type: 'income',
+        createdAt: new Date().toISOString(),
+        createdBy: 'admin'
+      }
+    ];
+    
+    state.transactions = sampleTransactions;
+    LS.set('transactions', state.transactions);
+  }
+  
+  console.log('Sample data initialized for demo');
+}
+
 // Clear all data and initialize fresh
 function clearAllDataAndReset() {
-  // Clear localStorage completely
-  localStorage.clear();
-  
-  // Reset state to defaults
+  // Reset state to defaults with sample data
   state.transactions = [];
   state.categories = ['Vehicle', 'Parts', 'Labor', 'Fuel', 'Maintenance', 'Insurance', 'Registration', 'Other'];
   state.accounts = ['Cash', 'Bank Account', 'Credit Card', 'Petty Cash'];
@@ -4967,7 +5015,10 @@ function clearAllDataAndReset() {
   LS.set('attendance', state.attendance);
   LS.set('settings', state.settings);
   
-  console.log('All data cleared and reset to defaults');
+  // Initialize with sample data for demo
+  initializeWithSampleData();
+  
+  console.log('All data cleared and reset to defaults with sample data');
 }
 
 // Initialize the app
