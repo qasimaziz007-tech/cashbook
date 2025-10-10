@@ -6,6 +6,17 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Esthetics Auto CashBook</title>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet"/>
+<!-- Electron Detection and App Styling -->
+<script>
+  window.isElectron = (typeof window !== 'undefined' && window.process && window.process.type) || 
+                     (typeof window !== 'undefined' && window.electronAPI);
+  
+  if (window.isElectron) {
+    document.documentElement.style.setProperty('--app-padding', '0px');
+  } else {
+    document.documentElement.style.setProperty('--app-padding', '18px');
+  }
+</script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
@@ -4913,21 +4924,37 @@ function updateBackupRetention() {
   showTransactionToast(`Backup retention updated to ${backupRetention === 'all' ? 'keep all' : 'last ' + backupRetention}`);
 }
 
-// Select backup folder (browser download folder simulation)
-function selectBackupFolder() {
-  // Since we can't actually select folders in browser, we'll simulate it
-  // and use the Downloads folder with a custom subfolder name
-  
-  const folderName = prompt('Enter backup folder name (will be created in Downloads):', 'EstheticsAutoBackups');
-  
-  if (folderName) {
-    const backupLocation = `Downloads/${folderName}`;
-    backupPath = backupLocation;
-    LS.set('backupPath', backupPath);
+// Select backup folder
+async function selectBackupFolder() {
+  if (window.electronAPI) {
+    // Use Electron folder selection dialog
+    try {
+      const selectedPath = await window.electronAPI.selectBackupFolder();
+      if (selectedPath) {
+        backupPath = selectedPath;
+        LS.set('backupPath', backupPath);
+        
+        document.getElementById('backupPath').value = selectedPath;
+        showTransactionToast(`Backup folder selected: ${selectedPath.split('/').pop()}`);
+        updateAutoBackupUI();
+      }
+    } catch (error) {
+      console.error('Folder selection failed:', error);
+      showTransactionToast('Failed to select folder - please try again');
+    }
+  } else {
+    // Browser version - simulate folder selection
+    const folderName = prompt('Enter backup folder name (will be created in Downloads):', 'EstheticsAutoBackups');
     
-    document.getElementById('backupPath').value = backupLocation;
-    showTransactionToast(`Backup folder set: ${backupLocation}`);
-    updateAutoBackupUI();
+    if (folderName) {
+      const backupLocation = `Downloads/${folderName}`;
+      backupPath = backupLocation;
+      LS.set('backupPath', backupPath);
+      
+      document.getElementById('backupPath').value = backupLocation;
+      showTransactionToast(`Backup folder set: ${backupLocation}`);
+      updateAutoBackupUI();
+    }
   }
 }
 
@@ -5038,9 +5065,9 @@ function performScheduledBackup() {
 }
 
 // Create backup now (manual)
-function createBackupNow() {
+async function createBackupNow() {
   try {
-    createBackupFile('manual');
+    await createBackupFile('manual');
     LS.set('lastAutoBackup', new Date().toISOString());
     updateAutoBackupUI();
     showTransactionToast('Backup created successfully!');
@@ -5051,7 +5078,7 @@ function createBackupNow() {
 }
 
 // Create backup file
-function createBackupFile(type = 'manual') {
+async function createBackupFile(type = 'manual') {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   const backupData = {
     version: '3.0',
@@ -5084,17 +5111,30 @@ function createBackupFile(type = 'manual') {
   backupData.localStorageDump = localStorageDump;
   
   const dataStr = JSON.stringify(backupData, null, 2);
-  const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-  
   const folderPrefix = backupPath ? backupPath.replace('Downloads/', '') + '_' : 'backup_';
   const filename = `${folderPrefix}${type}_${timestamp.split('T')[0]}_${timestamp.split('T')[1].split('.')[0].replace(/-/g, '')}.json`;
   
-  const linkElement = document.createElement('a');
-  linkElement.setAttribute('href', dataUri);
-  linkElement.setAttribute('download', filename);
-  linkElement.click();
-  
-  console.log(`Backup created: ${filename}`);
+  // Check if running in Electron app
+  if (window.electronAPI) {
+    // Use Electron file save dialog
+    const result = await window.electronAPI.saveBackupFile(dataStr, filename);
+    if (result.success) {
+      console.log(`Backup saved to: ${result.path}`);
+      showToast(`✅ Backup saved successfully to ${result.path.split('/').pop()}`, 'success');
+    } else {
+      console.error('Backup failed:', result.error);
+      showToast(`❌ Backup failed: ${result.error}`, 'error');
+    }
+  } else {
+    // Use browser download for web version
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', filename);
+    linkElement.click();
+    console.log(`Backup created: ${filename}`);
+    showToast(`✅ Backup downloaded: ${filename}`, 'success');
+  }
 }
 
 // Update auto backup UI
