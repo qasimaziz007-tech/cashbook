@@ -4898,51 +4898,72 @@ function formatDateTime(dateTimeString) {
 }
 
 function loadAllData() {
-  // Clear all existing data and reset to defaults
-  localStorage.clear();
+  // Load existing data from localStorage - DON'T clear it!
+  state.transactions = LS.get('transactions', []);
+  state.categories = LS.get('categories', ['Vehicle', 'Parts', 'Labor', 'Fuel', 'Maintenance', 'Insurance', 'Registration', 'Other']);
+  state.accounts = LS.get('accounts', ['Cash', 'Bank Account', 'Credit Card', 'Petty Cash']);
+  state.employees = LS.get('employees', []);
+  state.payroll = LS.get('payroll', []);
+  state.advances = LS.get('advances', []);
+  state.attendance = LS.get('attendance', []);
+  state.settings = LS.get('settings', { companyName: 'Esthetics Auto', companyAddress: 'Dubai, UAE', currency: 'AED' });
+
+  // Only save defaults if they don't exist
+  if (state.categories.length === 0) {
+    state.categories = ['Vehicle', 'Parts', 'Labor', 'Fuel', 'Maintenance', 'Insurance', 'Registration', 'Other'];
+    LS.set('categories', state.categories);
+  }
   
-  // Initialize with fresh default categories and accounts
-  state.transactions = [];
-  state.categories = ['Vehicle', 'Parts', 'Labor', 'Fuel', 'Maintenance', 'Insurance', 'Registration', 'Other'];
-  state.accounts = ['Cash', 'Bank Account', 'Credit Card', 'Petty Cash'];
-  state.employees = [];
-  state.payroll = [];
-  state.advances = [];
-  state.attendance = [];
-  
-  // Save fresh data to localStorage
-  LS.set('transactions', state.transactions);
-  LS.set('categories', state.categories);
-  LS.set('accounts', state.accounts);
-  LS.set('employees', state.employees);
-  LS.set('payroll', state.payroll);
-  LS.set('advances', state.advances);
-  LS.set('attendance', state.attendance);
+  if (state.accounts.length === 0) {
+    state.accounts = ['Cash', 'Bank Account', 'Credit Card', 'Petty Cash'];
+    LS.set('accounts', state.accounts);
+  }
   
   // Populate category and account dropdowns
   updateCategoryDropdown();
   updateAccountDropdown();
   
-  // Set default date to today
+  // Set default date to today for all date fields
+  const today = new Date().toISOString().split('T')[0];
+  
+  // Transaction form date
   const dateField = document.getElementById('date');
-  if (dateField) {
-    dateField.value = new Date().toISOString().split('T')[0];
+  if (dateField && !dateField.value) {
+    dateField.value = today;
   }
   
-  // Set default values for advance and attendance date fields
+  // Employee form dates
+  const empDob = document.getElementById('empDob');
+  if (empDob && !empDob.value) {
+    empDob.value = today;
+  }
+  
+  // Advance date
   const advanceDate = document.getElementById('advanceDate');
-  if (advanceDate) {
-    advanceDate.value = new Date().toISOString().split('T')[0];
+  if (advanceDate && !advanceDate.value) {
+    advanceDate.value = today;
   }
   
+  // Attendance date
   const attendanceDate = document.getElementById('attendanceDate');
-  if (attendanceDate) {
-    attendanceDate.value = new Date().toISOString().split('T')[0];
+  if (attendanceDate && !attendanceDate.value) {
+    attendanceDate.value = today;
   }
   
+  // Payroll date
   const payrollDate = document.getElementById('payrollDate');
-  if (payrollDate) {
-    payrollDate.value = new Date().toISOString().split('T')[0];
+  if (payrollDate && !payrollDate.value) {
+    payrollDate.value = today;
+  }
+  
+  // Vehicle report dates
+  const vrStartDate = document.getElementById('vrStartDate');
+  const vrEndDate = document.getElementById('vrEndDate');
+  if (vrStartDate && !vrStartDate.value) {
+    vrStartDate.value = today;
+  }
+  if (vrEndDate && !vrEndDate.value) {
+    vrEndDate.value = today;
   }
   
   // Using localStorage only - no cloud sync
@@ -4989,89 +5010,26 @@ function loadAccounts() {
   }
 }
 
-// Initialize with sample data for demo purposes
-function initializeWithSampleData() {
-  // Only initialize if no data exists
-  if (state.transactions.length === 0) {
-    // Add sample transactions for demo
-    const sampleTransactions = [
-      {
-        date: '2025-10-10',
-        category: 'Vehicle',
-        transactionId: 'DXB-001',
-        vendor: 'Dubai Motors',
-        account: 'Cash',
-        amount: 15000,
-        description: 'Vehicle service and parts',
-        type: 'expense',
-        createdAt: new Date().toISOString(),
-        createdBy: 'admin'
-      },
-      {
-        date: '2025-10-09',
-        category: 'Parts',
-        transactionId: 'PRT-001',
-        vendor: 'Auto Parts LLC',
-        account: 'Bank Account',
-        amount: 2500,
-        description: 'Engine oil and filters',
-        type: 'expense',
-        createdAt: new Date().toISOString(),
-        createdBy: 'admin'
-      },
-      {
-        date: '2025-10-08',
-        category: 'Vehicle',
-        transactionId: 'SHJ-002',
-        vendor: 'Sharjah Service Center',
-        account: 'Cash',
-        amount: 25000,
-        description: 'Customer payment for vehicle repair',
-        type: 'income',
-        createdAt: new Date().toISOString(),
-        createdBy: 'admin'
-      }
-    ];
-    
-    state.transactions = sampleTransactions;
-    LS.set('transactions', state.transactions);
+// Function to reset all data (admin only)
+function resetAllData() {
+  if (state.currentUser && state.currentUser.role === 'admin') {
+    if (confirm('Are you sure you want to reset all data? This will delete everything!')) {
+      localStorage.clear();
+      location.reload();
+    }
+  } else {
+    showTransactionToast('Only admin can reset data!');
   }
-  
-  console.log('Sample data initialized for demo');
 }
 
-// Clear all data and initialize fresh
-function clearAllDataAndReset() {
-  // Reset state to defaults with sample data
-  state.transactions = [];
-  state.categories = ['Vehicle', 'Parts', 'Labor', 'Fuel', 'Maintenance', 'Insurance', 'Registration', 'Other'];
-  state.accounts = ['Cash', 'Bank Account', 'Credit Card', 'Petty Cash'];
-  state.employees = [];
-  state.payroll = [];
-  state.advances = [];
-  state.attendance = [];
-  
-  // Save fresh defaults
-  LS.set('transactions', state.transactions);
-  LS.set('categories', state.categories);
-  LS.set('accounts', state.accounts);
-  LS.set('users', state.users);
-  LS.set('employees', state.employees);
-  LS.set('payroll', state.payroll);
-  LS.set('advances', state.advances);
-  LS.set('attendance', state.attendance);
-  LS.set('settings', state.settings);
-  
-  // Initialize with sample data for demo
-  initializeWithSampleData();
-  
-  console.log('All data cleared and reset to defaults with sample data');
-}
-
-// Initialize the app with guaranteed data
+// Initialize the app with persistent data
 function initializeAppWithData() {
-  // Always ensure we have sample data for demo
-  const sampleTransactions = [
+  // Load existing data from localStorage, or use defaults if none exists
+  const existingTransactions = LS.get('transactions', []);
+  const existingEmployees = LS.get('employees', []);
+  
+  // Default sample data (only used if no existing data)
+  const defaultSampleTransactions = [
     {
       date: '2025-10-10',
       category: 'Vehicle',
@@ -5107,46 +5065,10 @@ function initializeAppWithData() {
       type: 'income',
       createdAt: '2025-10-08T16:45:00Z',
       createdBy: 'admin'
-    },
-    {
-      date: '2025-10-07',
-      category: 'Fuel',
-      transactionId: 'FUEL-001',
-      vendor: 'ADNOC Station',
-      account: 'Credit Card',
-      amount: 300,
-      description: 'Fuel for company vehicles',
-      type: 'expense',
-      createdAt: '2025-10-07T08:20:00Z',
-      createdBy: 'admin'
-    },
-    {
-      date: '2025-10-06',
-      category: 'Labor',
-      transactionId: 'LAB-001',
-      vendor: 'Ahmed Mechanic',
-      account: 'Cash',
-      amount: 800,
-      description: 'Mechanic labor charges',
-      type: 'expense',
-      createdAt: '2025-10-06T12:30:00Z',
-      createdBy: 'admin'
-    },
-    {
-      date: '2025-10-05',
-      category: 'Vehicle',
-      transactionId: 'AUH-003',
-      vendor: 'Abu Dhabi Auto',
-      account: 'Bank Account',
-      amount: 18500,
-      description: 'BMW maintenance service payment received',
-      type: 'income',
-      createdAt: '2025-10-05T11:00:00Z',
-      createdBy: 'admin'
     }
   ];
 
-  const sampleEmployees = [
+  const defaultSampleEmployees = [
     {
       id: 'emp001',
       name: 'Ahmed Al Mansouri',
@@ -5164,50 +5086,41 @@ function initializeAppWithData() {
       status: 'active',
       createdAt: '2025-01-15T09:00:00Z',
       createdBy: 'admin'
-    },
-    {
-      id: 'emp002',
-      name: 'Mohammad Hassan',
-      position: 'Parts Specialist',
-      phone: '+971 55 987 6543',
-      email: 'mohammad@estheticsauto.com',
-      salary: 5500,
-      housing: 1500,
-      transport: 400,
-      other: 200,
-      visa: 'UAE987654321',
-      visaExpiry: '2025-12-10',
-      passport: 'B87654321',
-      passportExpiry: '2026-08-15',
-      status: 'active',
-      createdAt: '2025-02-01T10:30:00Z',
-      createdBy: 'admin'
     }
   ];
 
-  // Always use fresh sample data - don't rely on localStorage
-  state.transactions = sampleTransactions;
-  state.employees = sampleEmployees;
-  
-  // Save to localStorage for persistence on this device
-  LS.set('transactions', state.transactions);
-  LS.set('employees', state.employees);
+  // Use existing data if available, otherwise use sample data
+  if (existingTransactions.length > 0) {
+    state.transactions = existingTransactions;
+  } else {
+    state.transactions = defaultSampleTransactions;
+    LS.set('transactions', state.transactions);
+  }
+
+  if (existingEmployees.length > 0) {
+    state.employees = existingEmployees;
+  } else {
+    state.employees = defaultSampleEmployees;
+    LS.set('employees', state.employees);
+  }
+
+  // Ensure categories and accounts are always saved
   LS.set('categories', state.categories);
   LS.set('accounts', state.accounts);
   LS.set('users', state.users);
-  LS.set('payroll', state.payroll);
-  LS.set('advances', state.advances);
-  LS.set('attendance', state.attendance);
-  LS.set('settings', state.settings);
+  
+  console.log('App initialized with persistent data');
 }
 
 // Initialize the app
 document.addEventListener('DOMContentLoaded', function() {
-  // Always initialize with sample data for demo
-  initializeAppWithData();
-  
-  // Then load the UI
+  // Load existing data first
   loadAllData();
+  
+  // Initialize with sample data only if no data exists
+  if (state.transactions.length === 0) {
+    initializeAppWithData();
+  }
 });
 </script>
 
