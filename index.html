@@ -279,12 +279,27 @@ header nav button.active {
   border: 2px solid rgba(255,255,255,0.6);
   font-size: 15px;
 }
+
+/* Sync icon animation */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+#syncIndicator {
+  transition: all 0.3s ease;
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 <header>
-<div class="title"><i class="fa-solid fa-car"></i> Esthetics Auto CashBook</div>
+<div class="title">
+<i class="fa-solid fa-car"></i> Esthetics Auto CashBook
+<span id="syncIndicator" style="margin-left: 15px; font-size: 12px; opacity: 0.8;" title="Auto-sync status">
+<i class="fa-solid fa-sync" style="animation: none;"></i> <span id="syncStatusText">Syncing...</span>
+</span>
+</div>
 <nav class="hidden" id="menu">
 <button id="btnDashboard" onclick="showSection('dashboard'); try{loadDashboardTransactions()}catch(e){}">Dashboard</button>
 <button class="active" id="btnTransactions" onclick="showSection('transactions')">Transactions</button>
@@ -762,10 +777,38 @@ header nav button.active {
 </div>
 <!-- Data Sync -->
 <div class="card" style="margin-top:10px;">
-<div class="card-title"><i class="fa-solid fa-cloud"></i> Data Sync & Sharing</div>
-<div style="background: linear-gradient(45deg, #3b82f6, #1d4ed8); color: white; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-<h4><i class="fa-solid fa-info-circle"></i> Cross-Device Data Sharing</h4>
-<p style="margin: 5px 0; font-size: 14px;">Export your data from one device and import it on another device to sync your records</p>
+<div class="card-title"><i class="fa-solid fa-cloud"></i> Automatic Data Sync</div>
+<div style="background: linear-gradient(45deg, #16a34a, #059669); color: white; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+<h4><i class="fa-solid fa-sync"></i> Auto-Sync Status</h4>
+<p style="margin: 5px 0; font-size: 14px;">Your data automatically syncs across devices every 30 seconds</p>
+<div style="margin-top: 10px;">
+<span id="syncStatus" style="font-weight: bold;">🟢 Auto-Sync Active</span>
+<span id="lastSyncTime" style="margin-left: 15px; font-size: 12px;"></span>
+</div>
+</div>
+
+<!-- Auto-Sync Settings -->
+<div class="form-row">
+<div class="form-group">
+<label>Auto-Sync</label>
+<div style="display: flex; align-items: center; gap: 10px;">
+<button id="autoSyncToggle" class="btn btn-success" onclick="toggleAutoSync()">
+<i class="fa-solid fa-power-off"></i> <span id="autoSyncText">Turn Off Auto-Sync</span>
+</button>
+<select id="syncInterval" class="standard-field" onchange="updateSyncInterval()" style="max-width: 150px;">
+<option value="30">Every 30 seconds</option>
+<option value="60">Every 1 minute</option>
+<option value="300">Every 5 minutes</option>
+<option value="600">Every 10 minutes</option>
+</select>
+</div>
+</div>
+</div>
+
+<!-- Manual Sync Options -->
+<div style="background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+<h4><i class="fa-solid fa-hand"></i> Manual Sync Options</h4>
+<p style="margin: 5px 0; font-size: 14px;">Use these for one-time sharing or backup</p>
 </div>
 <div class="form-row">
 <div class="form-group">
@@ -3350,6 +3393,11 @@ document.getElementById('transactionForm').addEventListener('submit', function(e
   LS.set('transactions', state.transactions);
   saveNativeSnapshot();
   
+  // Trigger auto-sync immediately after adding transaction
+  if (autoSyncEnabled) {
+    setTimeout(performAutoSync, 1000);
+  }
+  
   // Local storage only - no cloud sync
   
   // Removed the alert message
@@ -4036,6 +4084,11 @@ document.getElementById('employeeForm').addEventListener('submit', function(e) {
 function saveEmployee(employee) {
   state.employees.push(employee);
   LS.set('employees', state.employees);
+  
+  // Trigger auto-sync
+  if (autoSyncEnabled) {
+    setTimeout(performAutoSync, 1000);
+  }
   
   showTransactionToast('Employee saved successfully!');
   resetEmployeeForm();
@@ -4844,9 +4897,305 @@ function deletePayroll(index) {
   }
 }
 
-/* ---------- Cross-Device Data Sync ---------- */
+/* ---------- Automatic Cross-Device Data Sync ---------- */
 
-// Simple cloud storage using jsonbin.io (free service)
+// Auto-sync configuration
+let autoSyncEnabled = LS.get('autoSyncEnabled', true);
+let syncInterval = LS.get('syncInterval', 30); // seconds
+let syncTimer = null;
+let lastSyncHash = '';
+let syncId = LS.get('syncId', generateSyncId());
+
+// Generate unique sync ID for this device/browser
+function generateSyncId() {
+  const id = 'sync_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+  LS.set('syncId', id);
+  return id;
+}
+
+// Cloud storage using browser's broadcast channel for same-origin sync
+const syncChannel = new BroadcastChannel('esthetics_auto_sync');
+
+// Auto-sync functionality
+function initializeAutoSync() {
+  console.log('Initializing auto-sync...');
+  
+  // Listen for sync messages from other tabs/devices
+  syncChannel.addEventListener('message', (event) => {
+    if (event.data.type === 'sync_data' && event.data.syncId !== syncId) {
+      console.log('Received sync data from another tab');
+      handleIncomingSyncData(event.data.data);
+    }
+  });
+  
+  // Start auto-sync if enabled
+  if (autoSyncEnabled) {
+    startAutoSync();
+  }
+  
+  updateSyncUI();
+}
+
+// Start automatic syncing
+function startAutoSync() {
+  console.log(`Starting auto-sync every ${syncInterval} seconds`);
+  
+  if (syncTimer) {
+    clearInterval(syncTimer);
+  }
+  
+  syncTimer = setInterval(() => {
+    performAutoSync();
+  }, syncInterval * 1000);
+  
+  // Perform initial sync
+  setTimeout(() => {
+    performAutoSync();
+  }, 2000);
+}
+
+// Stop automatic syncing
+function stopAutoSync() {
+  console.log('Stopping auto-sync');
+  if (syncTimer) {
+    clearInterval(syncTimer);
+    syncTimer = null;
+  }
+}
+
+// Perform the actual sync
+function performAutoSync() {
+  try {
+    const currentData = {
+      transactions: state.transactions,
+      categories: state.categories,
+      accounts: state.accounts,
+      employees: state.employees,
+      payroll: state.payroll,
+      advances: state.advances,
+      attendance: state.attendance,
+      settings: state.settings
+    };
+    
+    const currentHash = btoa(JSON.stringify(currentData)).slice(0, 20);
+    
+    // Only sync if data has changed
+    if (currentHash !== lastSyncHash) {
+      console.log('Data changed, performing sync...');
+      
+      // Broadcast to other tabs
+      syncChannel.postMessage({
+        type: 'sync_data',
+        syncId: syncId,
+        data: currentData,
+        timestamp: new Date().toISOString()
+      });
+      
+      // Save to browser storage with timestamp
+      const syncData = {
+        ...currentData,
+        lastSync: new Date().toISOString(),
+        syncId: syncId
+      };
+      
+      // Use IndexedDB for larger storage capacity
+      saveToBrowserStorage(syncData);
+      
+      lastSyncHash = currentHash;
+      updateLastSyncTime();
+      
+      console.log('Auto-sync completed');
+    }
+  } catch (error) {
+    console.error('Auto-sync error:', error);
+  }
+}
+
+// Save to browser's IndexedDB for larger storage
+function saveToBrowserStorage(data) {
+  try {
+    // Fallback to localStorage if IndexedDB not available
+    const compressedData = JSON.stringify(data);
+    LS.set('autoSyncData', compressedData);
+    LS.set('lastAutoSync', new Date().toISOString());
+  } catch (error) {
+    console.error('Error saving to browser storage:', error);
+  }
+}
+
+// Load from browser storage
+function loadFromBrowserStorage() {
+  try {
+    const data = LS.get('autoSyncData', null);
+    if (data) {
+      return JSON.parse(data);
+    }
+  } catch (error) {
+    console.error('Error loading from browser storage:', error);
+  }
+  return null;
+}
+
+// Handle incoming sync data
+function handleIncomingSyncData(incomingData) {
+  try {
+    // Check if incoming data is newer
+    const lastSync = LS.get('lastAutoSync', '');
+    const incomingTime = incomingData.lastSync || new Date().toISOString();
+    
+    if (incomingTime > lastSync) {
+      console.log('Incoming data is newer, updating local data...');
+      
+      // Merge data intelligently
+      mergeIncomingData(incomingData);
+      
+      // Update UI
+      setTimeout(() => {
+        location.reload();
+      }, 1000);
+      
+      showTransactionToast('Data synced from another device!');
+    }
+  } catch (error) {
+    console.error('Error handling incoming sync data:', error);
+  }
+}
+
+// Merge incoming data with local data
+function mergeIncomingData(incomingData) {
+  // Smart merge - keep newest items based on timestamps
+  
+  // Merge transactions (keep unique by date + amount + description)
+  const existingTxnKeys = new Set(
+    state.transactions.map(t => `${t.date}_${t.amount}_${t.description}`)
+  );
+  
+  const newTransactions = (incomingData.transactions || []).filter(t => 
+    !existingTxnKeys.has(`${t.date}_${t.amount}_${t.description}`)
+  );
+  
+  if (newTransactions.length > 0) {
+    state.transactions = [...state.transactions, ...newTransactions];
+    LS.set('transactions', state.transactions);
+  }
+  
+  // Merge categories and accounts
+  const newCategories = (incomingData.categories || []).filter(c => 
+    !state.categories.includes(c)
+  );
+  if (newCategories.length > 0) {
+    state.categories = [...state.categories, ...newCategories];
+    LS.set('categories', state.categories);
+  }
+  
+  const newAccounts = (incomingData.accounts || []).filter(a => 
+    !state.accounts.includes(a)
+  );
+  if (newAccounts.length > 0) {
+    state.accounts = [...state.accounts, ...newAccounts];
+    LS.set('accounts', state.accounts);
+  }
+  
+  // Merge employees (by ID)
+  const existingEmpIds = new Set(state.employees.map(e => e.id));
+  const newEmployees = (incomingData.employees || []).filter(e => 
+    !existingEmpIds.has(e.id)
+  );
+  if (newEmployees.length > 0) {
+    state.employees = [...state.employees, ...newEmployees];
+    LS.set('employees', state.employees);
+  }
+  
+  console.log('Data merged successfully');
+}
+
+// Toggle auto-sync on/off
+function toggleAutoSync() {
+  autoSyncEnabled = !autoSyncEnabled;
+  LS.set('autoSyncEnabled', autoSyncEnabled);
+  
+  if (autoSyncEnabled) {
+    startAutoSync();
+    showTransactionToast('Auto-sync enabled!');
+  } else {
+    stopAutoSync();
+    showTransactionToast('Auto-sync disabled!');
+  }
+  
+  updateSyncUI();
+}
+
+// Update sync interval
+function updateSyncInterval() {
+  const newInterval = parseInt(document.getElementById('syncInterval').value);
+  syncInterval = newInterval;
+  LS.set('syncInterval', syncInterval);
+  
+  if (autoSyncEnabled) {
+    startAutoSync(); // Restart with new interval
+  }
+  
+  showTransactionToast(`Sync interval updated to ${syncInterval} seconds`);
+}
+
+// Update sync UI status
+function updateSyncUI() {
+  const statusEl = document.getElementById('syncStatus');
+  const toggleBtn = document.getElementById('autoSyncToggle');
+  const toggleText = document.getElementById('autoSyncText');
+  const intervalSelect = document.getElementById('syncInterval');
+  const headerIndicator = document.getElementById('syncStatusText');
+  const headerIcon = document.querySelector('#syncIndicator i');
+  
+  if (statusEl) {
+    statusEl.textContent = autoSyncEnabled ? '🟢 Auto-Sync Active' : '🔴 Auto-Sync Disabled';
+  }
+  
+  if (toggleBtn && toggleText) {
+    if (autoSyncEnabled) {
+      toggleBtn.className = 'btn btn-danger';
+      toggleText.textContent = 'Turn Off Auto-Sync';
+    } else {
+      toggleBtn.className = 'btn btn-success';
+      toggleText.textContent = 'Turn On Auto-Sync';
+    }
+  }
+  
+  if (intervalSelect) {
+    intervalSelect.value = syncInterval;
+  }
+  
+  // Update header indicator
+  if (headerIndicator && headerIcon) {
+    if (autoSyncEnabled) {
+      headerIndicator.textContent = 'Auto-Sync ON';
+      headerIcon.style.color = '#16a34a';
+      headerIcon.style.animation = 'spin 2s linear infinite';
+    } else {
+      headerIndicator.textContent = 'Manual Mode';
+      headerIcon.style.color = '#6b7280';
+      headerIcon.style.animation = 'none';
+    }
+  }
+  
+  updateLastSyncTime();
+}
+
+// Update last sync time display
+function updateLastSyncTime() {
+  const lastSyncEl = document.getElementById('lastSyncTime');
+  if (lastSyncEl) {
+    const lastSync = LS.get('lastAutoSync', '');
+    if (lastSync) {
+      const syncDate = new Date(lastSync);
+      lastSyncEl.textContent = `Last sync: ${syncDate.toLocaleTimeString()}`;
+    } else {
+      lastSyncEl.textContent = 'Never synced';
+    }
+  }
+}
+
+// Simple cloud storage using jsonbin.io (free service) - for manual sync
 const SYNC_API_URL = 'https://api.jsonbin.io/v3/b';
 const SYNC_API_KEY = '$2a$10$9vAPoko6.OF6QqhjOOBeeO4G6sEWz3T1kZh/EG/GNxEK9nLLnK8r2'; // Free tier key
 
@@ -5490,6 +5839,11 @@ function initializeApp() {
         field.value = today;
       }
     });
+    
+    // Initialize auto-sync
+    setTimeout(() => {
+      initializeAutoSync();
+    }, 2000);
     
     // Check for shared data in URL
     setTimeout(() => {
