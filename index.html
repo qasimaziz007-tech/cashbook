@@ -764,6 +764,68 @@ header nav button.active {
 </div>
 </div>
 
+<!-- Auto Backup -->
+<div class="card" style="margin-top:10px;">
+<div class="card-title"><i class="fa-solid fa-clock"></i> Automatic Backup Settings</div>
+<div style="background: linear-gradient(45deg, #16a34a, #059669); color: white; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+<h4><i class="fa-solid fa-shield-halved"></i> Auto Backup Status</h4>
+<p style="margin: 5px 0; font-size: 14px;" id="autoBackupStatus">Auto backup creates regular copies of your data for safety</p>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label>Enable Auto Backup</label>
+<div style="display: flex; align-items: center; gap: 10px;">
+<button id="autoBackupToggle" class="btn btn-success" onclick="toggleAutoBackup()">
+<i class="fa-solid fa-power-off"></i> <span id="autoBackupText">Turn On Auto Backup</span>
+</button>
+</div>
+</div>
+<div class="form-group">
+<label>Backup Frequency</label>
+<select id="backupFrequency" class="standard-field" onchange="updateBackupFrequency()">
+<option value="daily">Daily at 9:00 AM</option>
+<option value="weekly">Weekly (Every Sunday)</option>
+<option value="monthly">Monthly (1st of month)</option>
+<option value="manual">Manual Only</option>
+</select>
+</div>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label>Backup Storage Location</label>
+<div style="display: flex; gap: 8px; align-items: center;">
+<input type="text" id="backupPath" class="standard-field" placeholder="Select backup folder..." readonly style="flex: 1;">
+<button class="btn btn-secondary" onclick="selectBackupFolder()">
+<i class="fa-solid fa-folder-open"></i> Browse
+</button>
+</div>
+<small style="color: #6b7280; font-size: 12px;">Choose where to save backup files automatically</small>
+</div>
+<div class="form-group">
+<label>Keep Backups</label>
+<select id="backupRetention" class="standard-field" onchange="updateBackupRetention()">
+<option value="5">Last 5 backups</option>
+<option value="10">Last 10 backups</option>
+<option value="30">Last 30 backups</option>
+<option value="all">Keep all backups</option>
+</select>
+</div>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label>Last Backup</label>
+<div id="lastBackupInfo" style="padding: 10px; background: #f3f4f6; border-radius: 6px; font-size: 14px;">
+Never backed up
+</div>
+</div>
+<div class="form-group" style="align-self: end;">
+<button class="btn btn-warning" onclick="createBackupNow()">
+<i class="fa-solid fa-download"></i> Backup Now
+</button>
+</div>
+</div>
+</div>
+
 <!-- Data -->
 <div class="card" style="margin-top:10px;">
 <div class="card-title"><i class="fa-solid fa-database"></i> Data Management</div>
@@ -3584,40 +3646,7 @@ function deleteAllTransactions() {
 }
 
 function backupAllData() {
-  // Create complete backup with metadata
-  const backupData = {
-    version: '2.0',
-    timestamp: new Date().toISOString(),
-    deviceInfo: navigator.userAgent,
-    data: {
-      transactions: state.transactions,
-      categories: state.categories,
-      accounts: state.accounts,
-      employees: state.employees,
-      payroll: state.payroll,
-      advances: state.advances,
-      attendance: state.attendance,
-      settings: state.settings
-    }
-  };
-  
-  // Include a dump of ALL localStorage keys (to capture Parts System too)
-  const localStorageDump = {};
-  for (let i = 0; i < localStorage.length; i++) {
-    const k = localStorage.key(i);
-    localStorageDump[k] = localStorage.getItem(k);
-  }
-  backupData.localStorageDump = localStorageDump;
-  
-  const dataStr = JSON.stringify(backupData, null, 2);
-  const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-  
-  const exportFileDefaultName = `esthetics_full_backup_${new Date().toISOString().split('T')[0]}.json`;
-  
-  const linkElement = document.createElement('a');
-  linkElement.setAttribute('href', dataUri);
-  linkElement.setAttribute('download', exportFileDefaultName);
-  linkElement.click();
+  createBackupFile('manual');
   showTransactionToast('Complete backup file downloaded successfully!');
 }
 
@@ -4810,6 +4839,353 @@ function deletePayroll(index) {
   }
 }
 
+/* ---------- Auto Backup System ---------- */
+
+// Auto backup configuration
+let autoBackupEnabled = LS.get('autoBackupEnabled', false);
+let backupFrequency = LS.get('backupFrequency', 'manual');
+let backupPath = LS.get('backupPath', '');
+let backupRetention = LS.get('backupRetention', '10');
+let backupTimer = null;
+
+// Initialize auto backup system
+function initializeAutoBackup() {
+  console.log('Initializing auto backup system...');
+  
+  // Update UI
+  updateAutoBackupUI();
+  
+  // Start auto backup if enabled
+  if (autoBackupEnabled && backupFrequency !== 'manual') {
+    scheduleAutoBackup();
+  }
+  
+  // Check if it's time for scheduled backup
+  checkScheduledBackup();
+}
+
+// Toggle auto backup on/off
+function toggleAutoBackup() {
+  autoBackupEnabled = !autoBackupEnabled;
+  LS.set('autoBackupEnabled', autoBackupEnabled);
+  
+  if (autoBackupEnabled) {
+    if (!backupPath) {
+      showTransactionToast('Please select a backup folder first!');
+      autoBackupEnabled = false;
+      LS.set('autoBackupEnabled', false);
+      updateAutoBackupUI();
+      return;
+    }
+    scheduleAutoBackup();
+    showTransactionToast('Auto backup enabled!');
+  } else {
+    if (backupTimer) {
+      clearInterval(backupTimer);
+      backupTimer = null;
+    }
+    showTransactionToast('Auto backup disabled!');
+  }
+  
+  updateAutoBackupUI();
+}
+
+// Update backup frequency
+function updateBackupFrequency() {
+  const newFrequency = document.getElementById('backupFrequency').value;
+  backupFrequency = newFrequency;
+  LS.set('backupFrequency', backupFrequency);
+  
+  if (autoBackupEnabled && backupFrequency !== 'manual') {
+    scheduleAutoBackup();
+  }
+  
+  showTransactionToast(`Backup frequency updated to ${backupFrequency}`);
+  updateAutoBackupUI();
+}
+
+// Update backup retention
+function updateBackupRetention() {
+  const newRetention = document.getElementById('backupRetention').value;
+  backupRetention = newRetention;
+  LS.set('backupRetention', backupRetention);
+  
+  showTransactionToast(`Backup retention updated to ${backupRetention === 'all' ? 'keep all' : 'last ' + backupRetention}`);
+}
+
+// Select backup folder (browser download folder simulation)
+function selectBackupFolder() {
+  // Since we can't actually select folders in browser, we'll simulate it
+  // and use the Downloads folder with a custom subfolder name
+  
+  const folderName = prompt('Enter backup folder name (will be created in Downloads):', 'EstheticsAutoBackups');
+  
+  if (folderName) {
+    const backupLocation = `Downloads/${folderName}`;
+    backupPath = backupLocation;
+    LS.set('backupPath', backupPath);
+    
+    document.getElementById('backupPath').value = backupLocation;
+    showTransactionToast(`Backup folder set: ${backupLocation}`);
+    updateAutoBackupUI();
+  }
+}
+
+// Schedule automatic backup
+function scheduleAutoBackup() {
+  console.log(`Scheduling auto backup: ${backupFrequency}`);
+  
+  // Clear existing timer
+  if (backupTimer) {
+    clearInterval(backupTimer);
+  }
+  
+  let intervalMs;
+  
+  switch (backupFrequency) {
+    case 'daily':
+      intervalMs = 24 * 60 * 60 * 1000; // 24 hours
+      break;
+    case 'weekly':
+      intervalMs = 7 * 24 * 60 * 60 * 1000; // 7 days
+      break;
+    case 'monthly':
+      intervalMs = 30 * 24 * 60 * 60 * 1000; // 30 days
+      break;
+    default:
+      return; // manual mode
+  }
+  
+  // Set interval for regular backups
+  backupTimer = setInterval(() => {
+    performScheduledBackup();
+  }, intervalMs);
+  
+  // Also check every hour if it's time for daily backup at 9 AM
+  if (backupFrequency === 'daily') {
+    setInterval(checkDailyBackupTime, 60 * 60 * 1000); // Check every hour
+  }
+}
+
+// Check if it's time for daily backup (9 AM)
+function checkDailyBackupTime() {
+  const now = new Date();
+  const hour = now.getHours();
+  
+  if (hour === 9) { // 9 AM
+    const lastBackup = LS.get('lastAutoBackup', '');
+    const today = now.toDateString();
+    
+    // Only backup once per day
+    if (!lastBackup || new Date(lastBackup).toDateString() !== today) {
+      performScheduledBackup();
+    }
+  }
+}
+
+// Check for scheduled backup on app start
+function checkScheduledBackup() {
+  if (!autoBackupEnabled || backupFrequency === 'manual') return;
+  
+  const lastBackup = LS.get('lastAutoBackup', '');
+  const now = new Date();
+  
+  if (!lastBackup) {
+    // First time - create backup after 1 minute
+    setTimeout(() => {
+      performScheduledBackup();
+    }, 60000);
+    return;
+  }
+  
+  const lastBackupDate = new Date(lastBackup);
+  const hoursSinceLastBackup = (now - lastBackupDate) / (1000 * 60 * 60);
+  
+  let shouldBackup = false;
+  
+  switch (backupFrequency) {
+    case 'daily':
+      shouldBackup = hoursSinceLastBackup >= 24;
+      break;
+    case 'weekly':
+      shouldBackup = hoursSinceLastBackup >= (7 * 24);
+      break;
+    case 'monthly':
+      shouldBackup = hoursSinceLastBackup >= (30 * 24);
+      break;
+  }
+  
+  if (shouldBackup) {
+    setTimeout(() => {
+      performScheduledBackup();
+    }, 5000); // Backup after 5 seconds
+  }
+}
+
+// Perform scheduled backup
+function performScheduledBackup() {
+  console.log('Performing scheduled backup...');
+  
+  try {
+    createBackupFile('auto');
+    LS.set('lastAutoBackup', new Date().toISOString());
+    updateAutoBackupUI();
+    showTransactionToast('Auto backup completed successfully!');
+  } catch (error) {
+    console.error('Auto backup failed:', error);
+    showTransactionToast('Auto backup failed - please check manually');
+  }
+}
+
+// Create backup now (manual)
+function createBackupNow() {
+  try {
+    createBackupFile('manual');
+    LS.set('lastAutoBackup', new Date().toISOString());
+    updateAutoBackupUI();
+    showTransactionToast('Backup created successfully!');
+  } catch (error) {
+    console.error('Manual backup failed:', error);
+    showTransactionToast('Backup failed - please try again');
+  }
+}
+
+// Create backup file
+function createBackupFile(type = 'manual') {
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const backupData = {
+    version: '3.0',
+    timestamp: new Date().toISOString(),
+    backupType: type,
+    deviceInfo: navigator.userAgent,
+    data: {
+      transactions: state.transactions,
+      categories: state.categories,
+      accounts: state.accounts,
+      employees: state.employees,
+      payroll: state.payroll,
+      advances: state.advances,
+      attendance: state.attendance,
+      settings: state.settings
+    },
+    stats: {
+      totalTransactions: state.transactions.length,
+      totalEmployees: state.employees.length,
+      dataSize: JSON.stringify(state).length
+    }
+  };
+  
+  // Include localStorage dump
+  const localStorageDump = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    localStorageDump[k] = localStorage.getItem(k);
+  }
+  backupData.localStorageDump = localStorageDump;
+  
+  const dataStr = JSON.stringify(backupData, null, 2);
+  const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+  
+  const folderPrefix = backupPath ? backupPath.replace('Downloads/', '') + '_' : 'backup_';
+  const filename = `${folderPrefix}${type}_${timestamp.split('T')[0]}_${timestamp.split('T')[1].split('.')[0].replace(/-/g, '')}.json`;
+  
+  const linkElement = document.createElement('a');
+  linkElement.setAttribute('href', dataUri);
+  linkElement.setAttribute('download', filename);
+  linkElement.click();
+  
+  console.log(`Backup created: ${filename}`);
+}
+
+// Update auto backup UI
+function updateAutoBackupUI() {
+  const statusEl = document.getElementById('autoBackupStatus');
+  const toggleBtn = document.getElementById('autoBackupToggle');
+  const toggleText = document.getElementById('autoBackupText');
+  const frequencySelect = document.getElementById('backupFrequency');
+  const retentionSelect = document.getElementById('backupRetention');
+  const pathInput = document.getElementById('backupPath');
+  const lastBackupEl = document.getElementById('lastBackupInfo');
+  
+  // Update status
+  if (statusEl) {
+    if (autoBackupEnabled) {
+      statusEl.textContent = `🟢 Auto backup active - ${backupFrequency} backups to ${backupPath || 'Downloads'}`;
+    } else {
+      statusEl.textContent = '🔴 Auto backup disabled - enable to protect your data automatically';
+    }
+  }
+  
+  // Update toggle button
+  if (toggleBtn && toggleText) {
+    if (autoBackupEnabled) {
+      toggleBtn.className = 'btn btn-danger';
+      toggleText.textContent = 'Turn Off Auto Backup';
+    } else {
+      toggleBtn.className = 'btn btn-success';
+      toggleText.textContent = 'Turn On Auto Backup';
+    }
+  }
+  
+  // Update dropdowns
+  if (frequencySelect) {
+    frequencySelect.value = backupFrequency;
+  }
+  
+  if (retentionSelect) {
+    retentionSelect.value = backupRetention;
+  }
+  
+  if (pathInput) {
+    pathInput.value = backupPath || 'Select backup folder...';
+  }
+  
+  // Update last backup info
+  if (lastBackupEl) {
+    const lastBackup = LS.get('lastAutoBackup', '');
+    if (lastBackup) {
+      const backupDate = new Date(lastBackup);
+      lastBackupEl.innerHTML = `
+        <strong>Last backup:</strong> ${backupDate.toLocaleDateString()} at ${backupDate.toLocaleTimeString()}<br>
+        <small style="color: #6b7280;">Next backup: ${getNextBackupTime()}</small>
+      `;
+    } else {
+      lastBackupEl.textContent = 'Never backed up';
+    }
+  }
+}
+
+// Get next backup time
+function getNextBackupTime() {
+  if (!autoBackupEnabled || backupFrequency === 'manual') {
+    return 'Manual only';
+  }
+  
+  const lastBackup = LS.get('lastAutoBackup', '');
+  if (!lastBackup) {
+    return 'Soon (within 1 minute)';
+  }
+  
+  const lastBackupDate = new Date(lastBackup);
+  let nextBackup;
+  
+  switch (backupFrequency) {
+    case 'daily':
+      nextBackup = new Date(lastBackupDate.getTime() + 24 * 60 * 60 * 1000);
+      break;
+    case 'weekly':
+      nextBackup = new Date(lastBackupDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+      break;
+    case 'monthly':
+      nextBackup = new Date(lastBackupDate.getTime() + 30 * 24 * 60 * 60 * 1000);
+      break;
+    default:
+      return 'Manual only';
+  }
+  
+  return nextBackup.toLocaleDateString() + ' at ' + nextBackup.toLocaleTimeString();
+}
+
 /* ---------- Simple Data Sharing ---------- */
 
 
@@ -5741,7 +6117,10 @@ function initializeApp() {
       }
     });
     
-    // No auto-sync - keeping it simple and reliable
+    // Initialize auto backup system
+    setTimeout(() => {
+      initializeAutoBackup();
+    }, 3000);
     
     console.log('App initialization completed successfully');
   } catch (error) {
