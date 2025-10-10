@@ -295,6 +295,10 @@ header nav button.active {
 <div class="container">
 <!-- LOGIN -->
 <section class="card" id="loginScreen" style="max-width:480px;margin:40px auto;">
+<div style="background: linear-gradient(45deg, #16a34a, #059669); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center;">
+<h4><i class="fa-solid fa-rocket"></i> Live Demo Ready!</h4>
+<p style="margin: 5px 0; font-size: 14px;">Sample data included • Works on all devices • No setup required</p>
+</div>
 <div class="card-title"><i class="fa-solid fa-right-to-bracket"></i> Login</div>
 <div class="form-row">
 <div class="form-group"><label>Username</label><input autocomplete="username" class="standard-field" id="loginUser"/></div>
@@ -318,6 +322,9 @@ header nav button.active {
 
 
 <div class="card-title"><i class="fa-solid fa-gauge-high"></i> Dashboard</div>
+<div style="background: linear-gradient(45deg, #3b82f6, #1d4ed8); color: white; padding: 12px; border-radius: 8px; margin-bottom: 15px; text-align: center; font-size: 14px;">
+<i class="fa-solid fa-info-circle"></i> <strong>Demo Mode:</strong> Sample data loaded for demonstration • Add your own transactions in the Transactions tab
+</div>
 <!-- Today's Summary -->
 <div class="card-title" style="margin-top:8px;"><i class="fa-solid fa-calendar-day"></i> Today's Summary</div>
 <div id="todaySummary" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;"></div>
@@ -2913,8 +2920,48 @@ const LS = {
 
 
 /* ---------- App State ---------- */
+// Default sample data that will always be available
+const defaultTransactions = [
+  {
+    date: '2025-10-10',
+    category: 'Vehicle',
+    transactionId: 'DXB-001',
+    vendor: 'Dubai Motors',
+    account: 'Cash',
+    amount: 15000,
+    description: 'Vehicle service and parts for Camry',
+    type: 'expense',
+    createdAt: '2025-10-10T10:30:00Z',
+    createdBy: 'admin'
+  },
+  {
+    date: '2025-10-09',
+    category: 'Parts',
+    transactionId: 'PRT-001',
+    vendor: 'Auto Parts LLC',
+    account: 'Bank Account',
+    amount: 2500,
+    description: 'Engine oil and filters - Toyota',
+    type: 'expense',
+    createdAt: '2025-10-09T14:15:00Z',
+    createdBy: 'admin'
+  },
+  {
+    date: '2025-10-08',
+    category: 'Vehicle',
+    transactionId: 'SHJ-002',
+    vendor: 'Sharjah Service Center',
+    account: 'Cash',
+    amount: 25000,
+    description: 'Customer payment for Honda Accord repair',
+    type: 'income',
+    createdAt: '2025-10-08T16:45:00Z',
+    createdBy: 'admin'
+  }
+];
+
 let state = {
-  transactions: [],
+  transactions: [...defaultTransactions],
   categories: ['Vehicle', 'Parts', 'Labor', 'Fuel', 'Maintenance', 'Insurance', 'Registration', 'Other'],
   accounts: ['Cash', 'Bank Account', 'Credit Card', 'Petty Cash'],
   users: [{ username: 'admin', password: 'admin', role: 'admin' }],
@@ -5021,12 +5068,145 @@ function clearAllDataAndReset() {
   console.log('All data cleared and reset to defaults with sample data');
 }
 
+// Initialize the app with guaranteed data
+function initializeAppWithData() {
+  // Always ensure we have sample data for demo
+  const sampleTransactions = [
+    {
+      date: '2025-10-10',
+      category: 'Vehicle',
+      transactionId: 'DXB-001',
+      vendor: 'Dubai Motors',
+      account: 'Cash',
+      amount: 15000,
+      description: 'Vehicle service and parts for Camry',
+      type: 'expense',
+      createdAt: '2025-10-10T10:30:00Z',
+      createdBy: 'admin'
+    },
+    {
+      date: '2025-10-09',
+      category: 'Parts',
+      transactionId: 'PRT-001',
+      vendor: 'Auto Parts LLC',
+      account: 'Bank Account',
+      amount: 2500,
+      description: 'Engine oil and filters - Toyota',
+      type: 'expense',
+      createdAt: '2025-10-09T14:15:00Z',
+      createdBy: 'admin'
+    },
+    {
+      date: '2025-10-08',
+      category: 'Vehicle',
+      transactionId: 'SHJ-002',
+      vendor: 'Sharjah Service Center',
+      account: 'Cash',
+      amount: 25000,
+      description: 'Customer payment for Honda Accord repair',
+      type: 'income',
+      createdAt: '2025-10-08T16:45:00Z',
+      createdBy: 'admin'
+    },
+    {
+      date: '2025-10-07',
+      category: 'Fuel',
+      transactionId: 'FUEL-001',
+      vendor: 'ADNOC Station',
+      account: 'Credit Card',
+      amount: 300,
+      description: 'Fuel for company vehicles',
+      type: 'expense',
+      createdAt: '2025-10-07T08:20:00Z',
+      createdBy: 'admin'
+    },
+    {
+      date: '2025-10-06',
+      category: 'Labor',
+      transactionId: 'LAB-001',
+      vendor: 'Ahmed Mechanic',
+      account: 'Cash',
+      amount: 800,
+      description: 'Mechanic labor charges',
+      type: 'expense',
+      createdAt: '2025-10-06T12:30:00Z',
+      createdBy: 'admin'
+    },
+    {
+      date: '2025-10-05',
+      category: 'Vehicle',
+      transactionId: 'AUH-003',
+      vendor: 'Abu Dhabi Auto',
+      account: 'Bank Account',
+      amount: 18500,
+      description: 'BMW maintenance service payment received',
+      type: 'income',
+      createdAt: '2025-10-05T11:00:00Z',
+      createdBy: 'admin'
+    }
+  ];
+
+  const sampleEmployees = [
+    {
+      id: 'emp001',
+      name: 'Ahmed Al Mansouri',
+      position: 'Senior Mechanic',
+      phone: '+971 50 123 4567',
+      email: 'ahmed@estheticsauto.com',
+      salary: 8000,
+      housing: 2000,
+      transport: 500,
+      other: 300,
+      visa: 'UAE123456789',
+      visaExpiry: '2026-05-15',
+      passport: 'A12345678',
+      passportExpiry: '2027-03-20',
+      status: 'active',
+      createdAt: '2025-01-15T09:00:00Z',
+      createdBy: 'admin'
+    },
+    {
+      id: 'emp002',
+      name: 'Mohammad Hassan',
+      position: 'Parts Specialist',
+      phone: '+971 55 987 6543',
+      email: 'mohammad@estheticsauto.com',
+      salary: 5500,
+      housing: 1500,
+      transport: 400,
+      other: 200,
+      visa: 'UAE987654321',
+      visaExpiry: '2025-12-10',
+      passport: 'B87654321',
+      passportExpiry: '2026-08-15',
+      status: 'active',
+      createdAt: '2025-02-01T10:30:00Z',
+      createdBy: 'admin'
+    }
+  ];
+
+  // Always use fresh sample data - don't rely on localStorage
+  state.transactions = sampleTransactions;
+  state.employees = sampleEmployees;
+  
+  // Save to localStorage for persistence on this device
+  LS.set('transactions', state.transactions);
+  LS.set('employees', state.employees);
+  LS.set('categories', state.categories);
+  LS.set('accounts', state.accounts);
+  LS.set('users', state.users);
+  LS.set('payroll', state.payroll);
+  LS.set('advances', state.advances);
+  LS.set('attendance', state.attendance);
+  LS.set('settings', state.settings);
+}
+
 // Initialize the app
 document.addEventListener('DOMContentLoaded', function() {
-  // Clear all data first
-  clearAllDataAndReset();
+  // Always initialize with sample data for demo
+  initializeAppWithData();
   
-  // Then load fresh
+  // Then load the UI
   loadAllData();
 });
 </script>
