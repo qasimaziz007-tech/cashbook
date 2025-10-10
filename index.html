@@ -2920,48 +2920,8 @@ const LS = {
 
 
 /* ---------- App State ---------- */
-// Default sample data that will always be available
-const defaultTransactions = [
-  {
-    date: '2025-10-10',
-    category: 'Vehicle',
-    transactionId: 'DXB-001',
-    vendor: 'Dubai Motors',
-    account: 'Cash',
-    amount: 15000,
-    description: 'Vehicle service and parts for Camry',
-    type: 'expense',
-    createdAt: '2025-10-10T10:30:00Z',
-    createdBy: 'admin'
-  },
-  {
-    date: '2025-10-09',
-    category: 'Parts',
-    transactionId: 'PRT-001',
-    vendor: 'Auto Parts LLC',
-    account: 'Bank Account',
-    amount: 2500,
-    description: 'Engine oil and filters - Toyota',
-    type: 'expense',
-    createdAt: '2025-10-09T14:15:00Z',
-    createdBy: 'admin'
-  },
-  {
-    date: '2025-10-08',
-    category: 'Vehicle',
-    transactionId: 'SHJ-002',
-    vendor: 'Sharjah Service Center',
-    account: 'Cash',
-    amount: 25000,
-    description: 'Customer payment for Honda Accord repair',
-    type: 'income',
-    createdAt: '2025-10-08T16:45:00Z',
-    createdBy: 'admin'
-  }
-];
-
 let state = {
-  transactions: [...defaultTransactions],
+  transactions: [], // Will be loaded from localStorage or sample data
   categories: ['Vehicle', 'Parts', 'Labor', 'Fuel', 'Maintenance', 'Insurance', 'Registration', 'Other'],
   accounts: ['Cash', 'Bank Account', 'Credit Card', 'Petty Cash'],
   users: [{ username: 'admin', password: 'admin', role: 'admin' }],
@@ -4898,30 +4858,15 @@ function formatDateTime(dateTimeString) {
 }
 
 function loadAllData() {
-  // Load existing data from localStorage - DON'T clear it!
-  state.transactions = LS.get('transactions', []);
-  state.categories = LS.get('categories', ['Vehicle', 'Parts', 'Labor', 'Fuel', 'Maintenance', 'Insurance', 'Registration', 'Other']);
-  state.accounts = LS.get('accounts', ['Cash', 'Bank Account', 'Credit Card', 'Petty Cash']);
-  state.employees = LS.get('employees', []);
-  state.payroll = LS.get('payroll', []);
-  state.advances = LS.get('advances', []);
-  state.attendance = LS.get('attendance', []);
-  state.settings = LS.get('settings', { companyName: 'Esthetics Auto', companyAddress: 'Dubai, UAE', currency: 'AED' });
-
-  // Only save defaults if they don't exist
-  if (state.categories.length === 0) {
-    state.categories = ['Vehicle', 'Parts', 'Labor', 'Fuel', 'Maintenance', 'Insurance', 'Registration', 'Other'];
-    LS.set('categories', state.categories);
-  }
-  
-  if (state.accounts.length === 0) {
-    state.accounts = ['Cash', 'Bank Account', 'Credit Card', 'Petty Cash'];
-    LS.set('accounts', state.accounts);
-  }
+  // Don't reload data here - it's already loaded in initializeApp()
+  // This function now just initializes the UI components
   
   // Populate category and account dropdowns
   updateCategoryDropdown();
   updateAccountDropdown();
+  
+  // Populate filter dropdowns as well
+  populateFilterDropdowns();
   
   // Set default date to today for all date fields
   const today = new Date().toISOString().split('T')[0];
@@ -4997,6 +4942,7 @@ function loadCategories() {
     state.categories.forEach(c => {
       categorySelect.innerHTML += `<option value="${c}">${c}</option>`;
     });
+    console.log('Categories loaded:', state.categories.length);
   }
 }
 
@@ -5007,7 +4953,33 @@ function loadAccounts() {
     state.accounts.forEach(a => {
       accountSelect.innerHTML += `<option value="${a}">${a}</option>`;
     });
+    console.log('Accounts loaded:', state.accounts.length);
   }
+}
+
+// Ensure all dropdowns are populated
+function populateAllDropdowns() {
+  console.log('Populating all dropdowns...');
+  updateCategoryDropdown();
+  updateAccountDropdown();
+  populateFilterDropdowns();
+  
+  // Also populate employee dropdowns if on employees page
+  const employeeDropdowns = [
+    'advanceEmployee', 'attendanceEmployee', 'payrollEmployee', 'filterPayrollEmployee'
+  ];
+  
+  employeeDropdowns.forEach(dropdownId => {
+    const dropdown = document.getElementById(dropdownId);
+    if (dropdown) {
+      dropdown.innerHTML = '<option value="">Select Employee</option>';
+      state.employees.forEach(emp => {
+        if (emp.status === 'active') {
+          dropdown.innerHTML += `<option value="${emp.id}">${emp.name}</option>`;
+        }
+      });
+    }
+  });
 }
 
 // Function to reset all data (admin only)
@@ -5112,15 +5084,97 @@ function initializeAppWithData() {
   console.log('App initialized with persistent data');
 }
 
+// Proper initialization function
+function initializeApp() {
+  console.log('Initializing Esthetics Auto CashBook...');
+  
+  try {
+    // Load all data from localStorage first
+    state.transactions = LS.get('transactions', []);
+    state.categories = LS.get('categories', ['Vehicle', 'Parts', 'Labor', 'Fuel', 'Maintenance', 'Insurance', 'Registration', 'Other']);
+    state.accounts = LS.get('accounts', ['Cash', 'Bank Account', 'Credit Card', 'Petty Cash']);
+    state.employees = LS.get('employees', []);
+    state.payroll = LS.get('payroll', []);
+    state.advances = LS.get('advances', []);
+    state.attendance = LS.get('attendance', []);
+    state.settings = LS.get('settings', { companyName: 'Esthetics Auto', companyAddress: 'Dubai, UAE', currency: 'AED' });
+
+    console.log('Loaded transactions:', state.transactions.length);
+    
+    // If no transactions exist, add sample data for demo
+    if (state.transactions.length === 0) {
+      console.log('No existing data, adding sample transactions...');
+      const sampleTransactions = [
+        {
+          date: '2025-10-10',
+          category: 'Vehicle',
+          transactionId: 'DXB-001',
+          vendor: 'Dubai Motors',
+          account: 'Cash',
+          amount: 15000,
+          description: 'Vehicle service and parts for Camry',
+          type: 'expense',
+          createdAt: '2025-10-10T10:30:00Z',
+          createdBy: 'admin'
+        },
+        {
+          date: '2025-10-09',
+          category: 'Parts',
+          transactionId: 'PRT-001',
+          vendor: 'Auto Parts LLC',
+          account: 'Bank Account',
+          amount: 2500,
+          description: 'Engine oil and filters - Toyota',
+          type: 'expense',
+          createdAt: '2025-10-09T14:15:00Z',
+          createdBy: 'admin'
+        },
+        {
+          date: '2025-10-08',
+          category: 'Vehicle',
+          transactionId: 'SHJ-002',
+          vendor: 'Sharjah Service Center',
+          account: 'Cash',
+          amount: 25000,
+          description: 'Customer payment for Honda Accord repair',
+          type: 'income',
+          createdAt: '2025-10-08T16:45:00Z',
+          createdBy: 'admin'
+        }
+      ];
+      
+      state.transactions = sampleTransactions;
+      LS.set('transactions', state.transactions);
+      console.log('Sample data initialized');
+    }
+
+    // Ensure categories and accounts are saved
+    LS.set('categories', state.categories);
+    LS.set('accounts', state.accounts);
+    
+    // Initialize UI components
+    loadAllData();
+    populateAllDropdowns();
+    
+    // Set up date fields
+    const today = new Date().toISOString().split('T')[0];
+    const dateFields = ['date', 'advanceDate', 'attendanceDate', 'payrollDate', 'vrStartDate', 'vrEndDate'];
+    dateFields.forEach(fieldId => {
+      const field = document.getElementById(fieldId);
+      if (field && !field.value) {
+        field.value = today;
+      }
+    });
+    
+    console.log('App initialization completed successfully');
+  } catch (error) {
+    console.error('Error during initialization:', error);
+  }
+}
+
 // Initialize the app
 document.addEventListener('DOMContentLoaded', function() {
-  // Load existing data first
-  loadAllData();
-  
-  // Initialize with sample data only if no data exists
-  if (state.transactions.length === 0) {
-    initializeAppWithData();
-  }
+  initializeApp();
 });
 </script>
 
