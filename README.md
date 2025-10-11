@@ -2,14 +2,22 @@
 
 Professional CashBook Management System for Automotive Business
 
-## 🚀 Access Application
+## 🚀 System Installation
 
-### 💻 **Live Web App** 
-**[https://qasimaziz007-tech.github.io/cashbook/](https://qasimaziz007-tech.github.io/cashbook/)**
+### 🍎 **Mac/Linux Installation:**
+```bash
+# Download and run installer
+./install.sh
+```
 
-### 📱 **Local Use**
-- Download `index.html` and open in any browser
-- Works completely offlinecs Auto CashBook
+### �️ **Windows Installation:**
+```cmd
+# Right-click and "Run as Administrator"
+install.bat
+```
+
+### 🌐 **Web Version** 
+**[https://qasimaziz007-tech.github.io/cashbook/](https://qasimaziz007-tech.github.io/cashbook/)**cs Auto CashBook
 
 Professional CashBook Management System for Automotive Business
 
