@@ -294,6 +294,209 @@ header nav button.active {
 .nav-btn.active{
   background: linear-gradient(135deg, #60a5fa, #2563eb);
 }
+/* ==== Enhanced UI Animations & Loading States ==== */
+
+/* Loading spinner */
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255,255,255,.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Smooth card hover effects */
+.card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+}
+
+/* Enhanced input focus states */
+input:focus, select:focus {
+  outline: none !important;
+  border-color: var(--brand-2) !important;
+  box-shadow: 0 0 0 3px rgba(30, 111, 217, 0.1) !important;
+  transform: scale(1.02);
+  transition: all 0.2s ease;
+}
+
+/* Table row hover effects */
+tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+tbody tr:hover {
+  background-color: rgba(30, 111, 217, 0.05);
+}
+
+/* Fade-in animation for new content */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Success animation for forms */
+.form-success {
+  animation: successPulse 0.6s ease-in-out;
+}
+
+@keyframes successPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); background-color: rgba(22, 163, 74, 0.1); }
+  100% { transform: scale(1); }
+}
+
+/* Enhanced toast notifications */
+.toast-notification {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100px);
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  color: white;
+  padding: 16px 32px;
+  border-radius: 12px;
+  font-weight: 600;
+  z-index: 10000;
+  box-shadow: 0 10px 25px rgba(22, 163, 74, 0.3);
+  animation: toastSlideIn 0.4s ease-out forwards;
+}
+
+.toast-notification.error {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  box-shadow: 0 10px 25px rgba(239, 68, 68, 0.3);
+}
+
+@keyframes toastSlideIn {
+  to {
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* Chart loading state */
+.chart-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.chart-loading .loading-spinner {
+  margin-right: 10px;
+  border-color: rgba(107, 114, 128, 0.3);
+  border-top-color: var(--muted);
+}
+
+/* Enhanced form validation states */
+.form-group.error input,
+.form-group.error select {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+.form-group.success input,
+.form-group.success select {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+}
+
+/* Skeleton loading for tables */
+.skeleton-row {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Micro-interactions for action buttons */
+.action-btn {
+  transition: all 0.15s ease;
+}
+
+.action-btn:hover {
+  transform: scale(1.1);
+  color: var(--brand);
+}
+
+.action-btn:active {
+  transform: scale(0.95);
+}
+
+/* Enhanced modal/popup animations */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Progress indicators */
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(30, 111, 217, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--brand-2), var(--brand));
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+/* ==== End Enhanced UI Animations ==== */
+
 /* ==== End Injected Styles ==== */
 
 /* ==== Current Page Active Button Highlight (Injected) ==== */
@@ -1402,6 +1605,8 @@ function loadDashboard() {
   populateFilterDropdowns();
 }
 
+
+
 function loadTodaySummary() {
   const today = new Date().toISOString().split('T')[0];
   const todayTransactions = state.transactions.filter(t => t.date === today);
@@ -1683,56 +1888,108 @@ function canEditTransaction(transaction) {
   return (currentTime - createdTime) < tenMinutes;
 }
 
-document.getElementById('transactionForm').addEventListener('submit', function(e) {
+document.getElementById('transactionForm').addEventListener('submit', async function(e) {
   e.preventDefault();
+  
+  const submitBtn = this.querySelector('button[type="submit"]');
+  const originalText = submitBtn.innerHTML;
+  
   try {
-  
-  const transaction = {
-    id: editingTransaction?.id || editingTransaction?._id || ((window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : ('txn_'+Date.now()+'_'+Math.floor(Math.random()*1e6))),
-    date: document.getElementById('date').value,
-    category: document.getElementById('category').value,
-    transactionId: document.getElementById('transactionId').value,
-    vendor: document.getElementById('vendor').value,
-    account: document.getElementById('account').value,
-    amount: (function(){ const v = parseFloat(document.getElementById('amount').value); return isNaN(v)?0:v; })(),
-    description: document.getElementById('description').value,
-    type: document.getElementById('transactionType').value,
-    createdAt: editingTransaction && editingTransaction.createdAt ? editingTransaction.createdAt : new Date().toISOString(),
-    createdBy: editingTransaction ? editingTransaction.createdBy : ((state.currentUser && state.currentUser.username) ? state.currentUser.username : 'anonymous'),
-    editedAt: editingTransaction ? new Date().toISOString() : undefined,
-    editedBy: editingTransaction ? ((state.currentUser && state.currentUser.username) ? state.currentUser.username : 'anonymous') : undefined
-  };
-  
-  if (!transaction.date) { showTransactionToast('Please select a date'); return; }
-  if (!transaction.category) { showTransactionToast('Please select a category'); return; }
-  if (!transaction.account) { showTransactionToast('Please select an account'); return; }
-  if (transaction.amount <= 0) { showTransactionToast('Please enter a valid amount'); return; }
-  
-  // Save to localStorage (immediate)
-  state.transactions.push(transaction);
-  LS.set('transactions', state.transactions);
-  saveNativeSnapshot();
-  
-  // Force reload state from localStorage to ensure consistency
-  state.transactions = LS.get('transactions', []);
-  
-  // Sync to Firebase if enabled
-  if (firestoreEnabled && db) {
-    syncTransactionToFirestore(transaction).catch(err => {
-      console.warn('Firebase sync failed (continuing with local save):', err);
-    });
-  }
-  
-  // Removed the alert message
-  resetForm();
-  editingTransaction = null; // Clear editing state
-  // Refresh UI fully after save
-  try { loadTransactions(); loadDashboard(); } catch(e) { console.warn('Post-save UI refresh failed', e); }
-  
-  showTransactionToast('Transaction saved');
-  } catch(err){
-  console.error('Submit error', err);
-  showTransactionToast('Failed to save: ' + (err?.message || err));
+    // Set loading state
+    setLoadingState(submitBtn, true, 'Saving...');
+    
+    const transaction = {
+      id: editingTransaction?.id || editingTransaction?._id || ((window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : ('txn_'+Date.now()+'_'+Math.floor(Math.random()*1e6))),
+      date: document.getElementById('date').value,
+      category: document.getElementById('category').value,
+      transactionId: document.getElementById('transactionId').value,
+      vendor: document.getElementById('vendor').value,
+      account: document.getElementById('account').value,
+      amount: (function(){ const v = parseFloat(document.getElementById('amount').value); return isNaN(v)?0:v; })(),
+      description: document.getElementById('description').value,
+      type: document.getElementById('transactionType').value,
+      createdAt: editingTransaction && editingTransaction.createdAt ? editingTransaction.createdAt : new Date().toISOString(),
+      createdBy: editingTransaction ? editingTransaction.createdBy : ((state.currentUser && state.currentUser.username) ? state.currentUser.username : 'anonymous'),
+      editedAt: editingTransaction ? new Date().toISOString() : undefined,
+      editedBy: editingTransaction ? ((state.currentUser && state.currentUser.username) ? state.currentUser.username : 'anonymous') : undefined
+    };
+    
+    // Enhanced validation with visual feedback
+    let isValid = true;
+    
+    if (!transaction.date) { 
+      validateFormField('date', false, 'Please select a date');
+      isValid = false;
+    } else {
+      validateFormField('date', true);
+    }
+    
+    if (!transaction.category) { 
+      validateFormField('category', false, 'Please select a category');
+      isValid = false;
+    } else {
+      validateFormField('category', true);
+    }
+    
+    if (!transaction.account) { 
+      validateFormField('account', false, 'Please select an account');
+      isValid = false;
+    } else {
+      validateFormField('account', true);
+    }
+    
+    if (transaction.amount <= 0) { 
+      validateFormField('amount', false, 'Please enter a valid amount');
+      isValid = false;
+    } else {
+      validateFormField('amount', true);
+    }
+    
+    if (!isValid) {
+      setLoadingState(submitBtn, false, originalText);
+      return;
+    }
+    
+    // Small delay for better UX (shows loading state)
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    // Save to localStorage (immediate)
+    state.transactions.push(transaction);
+    LS.set('transactions', state.transactions);
+    saveNativeSnapshot();
+    
+    // Force reload state from localStorage to ensure consistency
+    state.transactions = LS.get('transactions', []);
+    
+    // Sync to Firebase if enabled
+    if (firestoreEnabled && db) {
+      syncTransactionToFirestore(transaction).catch(err => {
+        console.warn('Firebase sync failed (continuing with local save):', err);
+      });
+    }
+    
+    // Add success animation to form
+    this.classList.add('form-success');
+    setTimeout(() => this.classList.remove('form-success'), 600);
+    
+    resetForm();
+    editingTransaction = null; // Clear editing state
+    
+    // Refresh UI fully after save
+    try { 
+      loadTransactions(); 
+      loadDashboard(); 
+    } catch(e) { 
+      console.warn('Post-save UI refresh failed', e); 
+    }
+    
+    setLoadingState(submitBtn, false, originalText);
+    showTransactionToast('Transaction saved successfully!', 'success');
+    
+  } catch(err) {
+    console.error('Submit error', err);
+    setLoadingState(submitBtn, false, originalText);
+    showTransactionToast('Failed to save: ' + (err?.message || err), 'error');
   }
 });
 
@@ -1774,49 +2031,82 @@ function resetForm() {
   editingTransaction = null;
 }
 
-// Toast notification for transaction save (global scope)
-function showTransactionToast(msg) {
-  console.log('🔔 Toast function called with message:', msg);
+// Enhanced toast notification with animations
+function showTransactionToast(msg, type = 'success') {
+  console.log('🔔 Enhanced toast function called with message:', msg);
   
   let toast = document.createElement('div');
+  toast.className = `toast-notification ${type === 'error' ? 'error' : ''}`;
+  
   let icon = document.createElement('span');
   icon.style.marginRight = '12px';
-  icon.style.fontSize = '22px';
-  icon.style.verticalAlign = 'middle';
-  if (msg.toLowerCase().includes('saved')) {
+  icon.style.fontSize = '20px';
+  
+  if (type === 'success' || msg.toLowerCase().includes('saved')) {
     icon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
-  } else {
+  } else if (type === 'error') {
     icon.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i>';
+  } else {
+    icon.innerHTML = '<i class="fa-solid fa-info-circle"></i>';
   }
+  
   toast.appendChild(icon);
+  
   let text = document.createElement('span');
   text.textContent = msg;
   toast.appendChild(text);
-  toast.style.position = 'fixed';
-  toast.style.top = '20px';
-  toast.style.left = '50%';
-  toast.style.transform = 'translateX(-50%)';
-  toast.style.background = msg.toLowerCase().includes('saved') ? '#16a34a' : '#f59e0b';
-  toast.style.color = '#fff';
-  toast.style.padding = '16px 32px';
-  toast.style.borderRadius = '12px';
-  toast.style.fontWeight = 'bold';
-  toast.style.fontSize = '16px';
-  toast.style.zIndex = '99999';
-  toast.style.boxShadow = '0 4px 16px rgba(0,0,0,0.3)';
-  toast.style.letterSpacing = '1px';
-  toast.style.textAlign = 'center';
-  toast.style.maxWidth = '90vw';
-  toast.style.pointerEvents = 'none';
-  toast.style.minWidth = '200px';
+  
   document.body.appendChild(toast);
   
-  console.log('✅ Toast element created and added to body');
-  
+  // Auto-remove after animation
   setTimeout(() => {
-    toast.remove();
-    console.log('🗑️ Toast removed after timeout');
-  }, 3000);
+    toast.style.animation = 'toastSlideIn 0.3s ease-out reverse';
+    setTimeout(() => {
+      if (toast.parentNode) {
+        toast.remove();
+      }
+    }, 300);
+  }, 2700);
+  
+  console.log('✅ Enhanced toast created and animated');
+}
+
+// Loading state management
+function setLoadingState(element, isLoading, originalText) {
+  if (isLoading) {
+    element.disabled = true;
+    element.innerHTML = `<span class="loading-spinner"></span> ${originalText || 'Loading...'}`;
+    element.style.opacity = '0.8';
+  } else {
+    element.disabled = false;
+    element.innerHTML = originalText;
+    element.style.opacity = '1';
+  }
+}
+
+// Form validation with visual feedback
+function validateFormField(fieldId, isValid, errorMessage = '') {
+  const formGroup = document.getElementById(fieldId).closest('.form-group');
+  formGroup.classList.remove('error', 'success');
+  
+  if (isValid) {
+    formGroup.classList.add('success');
+  } else {
+    formGroup.classList.add('error');
+    if (errorMessage) {
+      showTransactionToast(errorMessage, 'error');
+    }
+  }
+}
+
+// Add fade-in animation to new table rows
+function addTableRowWithAnimation(table, rowHTML) {
+  const tbody = table.querySelector('tbody');
+  const row = document.createElement('tr');
+  row.innerHTML = rowHTML;
+  row.classList.add('fade-in');
+  tbody.insertBefore(row, tbody.firstChild);
+  return row;
 }
 
 let editingTransaction = null;
@@ -1863,6 +2153,13 @@ function deleteTransaction(index) {
 
 /* ---------- Settings ---------- */
 function loadSettings() {
+  // Clear any running auto backup intervals to prevent unwanted backups
+  if (window.autoBackupInterval) {
+    clearInterval(window.autoBackupInterval);
+    window.autoBackupInterval = null;
+    console.log('🛑 Cleared existing backup interval on settings load');
+  }
+  
   // Categories
   const categoryChips = document.getElementById('categoryChips');
   categoryChips.innerHTML = '';
@@ -2222,54 +2519,87 @@ if (backupData.localStorageDump){
 }
 
 /* ---------- Export Functions ---------- */
-function exportExcel() {
-  const filteredTransactions = filterTransactions();
+async function exportExcel() {
+  const exportBtn = document.getElementById('exportBtn');
+  const originalText = exportBtn.innerHTML;
   
-  if (filteredTransactions.length === 0) {
-    alert('No transactions to export');
-    return;
-  }
-  
-  const data = filteredTransactions.map(t => ({
-    Date: formatDisplayDate(t.date),
-    Category: t.category,
-    ID: t.transactionId || '',
-    Vendor: t.vendor || '',
-    Account: t.account,
-    Amount: formatDisplayAmount(t.amount),
-    Description: t.description || '',
-    Type: t.type,
-    'Created By': t.createdBy || 'anonymous',
-    'Edited By': t.editedBy || ''
-  }));
-  
-  const worksheet = XLSX.utils.json_to_sheet(data);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'Transactions');
-  
-  // Export with organized folder structure
-  const filename = `transactions_${new Date().toISOString().split('T')[0]}.xlsx`;
-  
-  if ('showDirectoryPicker' in window) {
-    // Try to save to Exports folder
-    const buffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  try {
+    setLoadingState(exportBtn, true, 'Exporting...');
     
-    if (window.exportFolderHandle) {
-      saveToFolder(window.exportFolderHandle, filename, blob, 'Excel Export');
-    } else {
-      // Ask user to select Exports folder
-      window.showDirectoryPicker().then(handle => {
-        window.exportFolderHandle = handle;
-        saveToFolder(handle, filename, blob, 'Excel Export');
-      }).catch(() => {
-        // Fallback to normal download
-        XLSX.writeFile(workbook, filename);
-      });
+    const filteredTransactions = filterTransactions();
+    
+    if (filteredTransactions.length === 0) {
+      showTransactionToast('No transactions to export', 'error');
+      return;
     }
-  } else {
-    // Fallback for older browsers
-    XLSX.writeFile(workbook, filename);
+    
+    // Small delay for UX
+    await new Promise(resolve => setTimeout(resolve, 200));
+    
+    const data = filteredTransactions.map(t => ({
+      Date: formatDisplayDate(t.date),
+      Category: t.category,
+      ID: t.transactionId || '',
+      Vendor: t.vendor || '',
+      Account: t.account,
+      Amount: parseFloat(t.amount), // Keep as number for Excel
+      'Amount (Formatted)': formatDisplayAmount(t.amount),
+      Description: t.description || '',
+      Type: t.type,
+      'Created By': t.createdBy || 'anonymous',
+      'Created At': t.createdAt ? formatDateTime(t.createdAt) : '',
+      'Edited By': t.editedBy || '',
+      'Edited At': t.editedAt ? formatDateTime(t.editedAt) : ''
+    }));
+    
+    // Add summary sheet
+    const summary = {
+      'Total Transactions': filteredTransactions.length,
+      'Total Income': filteredTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + parseFloat(t.amount), 0),
+      'Total Expense': filteredTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + parseFloat(t.amount), 0),
+      'Export Date': new Date().toISOString(),
+      'Exported By': state.currentUser?.username || 'anonymous'
+    };
+    
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const summarySheet = XLSX.utils.json_to_sheet([summary]);
+    const workbook = XLSX.utils.book_new();
+    
+    XLSX.utils.book_append_sheet(workbook, summarySheet, 'Summary');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Transactions');
+    
+    // Export with organized folder structure
+    const filename = `transactions_${new Date().toISOString().split('T')[0]}.xlsx`;
+    
+    if ('showDirectoryPicker' in window) {
+      // Try to save to Exports folder
+      const buffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      
+      if (window.exportFolderHandle) {
+        saveToFolder(window.exportFolderHandle, filename, blob, 'Excel Export');
+      } else {
+        // Ask user to select Exports folder
+        window.showDirectoryPicker().then(handle => {
+          window.exportFolderHandle = handle;
+          saveToFolder(handle, filename, blob, 'Excel Export');
+        }).catch(() => {
+          // Fallback to normal download
+          XLSX.writeFile(workbook, filename);
+        });
+      }
+    } else {
+      // Fallback for older browsers
+      XLSX.writeFile(workbook, filename);
+    }
+    
+    showTransactionToast(`Successfully exported ${filteredTransactions.length} transactions!`, 'success');
+    
+  } catch (error) {
+    console.error('Export error:', error);
+    showTransactionToast('Export failed: ' + error.message, 'error');
+  } finally {
+    setLoadingState(exportBtn, false, originalText);
   }
 }
 
@@ -2387,6 +2717,12 @@ function selectLocalFolder() {
 }
 
 function saveBackupSettings() {
+  // Clear any existing auto backup to prevent unwanted automatic backups
+  if (window.autoBackupInterval) {
+    clearInterval(window.autoBackupInterval);
+    window.autoBackupInterval = null;
+  }
+  
   const backupSettings = {
     service: document.getElementById('backupService').value,
     frequency: document.getElementById('backupFrequency').value,
@@ -2394,16 +2730,12 @@ function saveBackupSettings() {
     dropboxFolder: document.getElementById('dropboxFolder').value,
     localBackupFolder: document.getElementById('localBackupFolder').value,
     lastBackup: null,
-    enabled: document.getElementById('backupService').value !== '' && document.getElementById('backupFrequency').value !== 'off'
+    enabled: false // Don't auto-enable, let user manually test backups
   };
   
   LS.set('backupSettings', backupSettings);
   
-  if (backupSettings.enabled) {
-    scheduleAutoBackup(backupSettings);
-  }
-  
-  alert('Backup settings saved successfully!');
+  alert('Backup settings saved successfully!\n\nNote: Use "Test Backup Now" button to manually create backups when needed.');
 }
 
 function testBackup() {
@@ -2503,9 +2835,8 @@ function loadBackupSettings() {
     
     toggleBackupOptions();
     
-    if (settings.enabled) {
-      scheduleAutoBackup(settings);
-    }
+    // Don't automatically schedule backups on page load
+    // Only schedule when user explicitly saves settings
   }
 }
 
