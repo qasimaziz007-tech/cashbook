@@ -1,0 +1,64 @@
+{
+  "name": "esthetics-auto-cashbook",
+  "version": "1.0.0",
+  "description": "Esthetics Auto Account - Cashbook & Parts as a desktop app",
+  "main": "main.js",
+  "author": "Qasim Aziz",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "clean": "rm -rf dist node_modules package-lock.json",
+    "build:mac": "electron-builder --mac dmg --config.directories.output=dist/mac-installer",
+    "build:win": "electron-builder --win nsis --config.directories.output=dist/win-installer"
+  },
+  "devDependencies": {
+    "electron": "^31.3.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.estheticsauto.cashbook",
+    "productName": "Esthetics Auto Cashbook",
+    "directories": {
+      "output": "dist",
+      "buildResources": "assets"
+    },
+    "files": [
+      "index.html",
+      "parts.html",
+      "main.js",
+      "preload.js",
+      "assets/**"
+    ],
+    "asar": true,
+    "mac": {
+      "category": "public.app-category.business",
+      "target": [
+        { "target": "dmg", "arch": ["x64", "arm64"] }
+      ],
+      "artifactName": "${productName}-${version}-${arch}.dmg",
+      "icon": "assets/icon.png",
+      "identity": null,
+      "sign": false,
+      "hardenedRuntime": false
+    },
+    "win": {
+      "target": [
+        { "target": "nsis", "arch": ["x64"] }
+      ],
+      "artifactName": "${productName}-Setup-${version}.exe",
+      "icon": "assets/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "dmg": {
+      "icon": "assets/icon.png",
+      "contents": [
+        { "x": 130, "y": 220 },
+        { "x": 410, "y": 220, "type": "link", "path": "/Applications" }
+      ]
+    }
+  }
+}
