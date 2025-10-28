@@ -421,16 +421,46 @@ header nav button.active {
 <div id="notificationContainer" class="notification-container"></div>
 
 <div class="container">
+<!-- Animated Cars Background -->
+<div class="login-cars">
+  <div class="car">🚗</div>
+  <div class="car">🚙</div>
+  <div class="car">🚕</div>
+  <div class="car">🚐</div>
+</div>
+
+<!-- Floating Particles -->
+<div class="particles">
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+</div>
+
 <!-- LOGIN -->
 <section class="card" id="loginScreen" style="max-width:480px;margin:40px auto;">
-<div class="card-title"><i class="fa-solid fa-right-to-bracket"></i> Login</div>
-<div class="form-row">
-<div class="form-group"><label>Username</label><input autocomplete="username" class="standard-field" id="loginUser"/></div>
-<div class="form-group"><label>Password</label><input autocomplete="current-password" class="standard-field" id="loginPass" onkeypress="handleLoginKeyPress(event)" type="password"/></div>
+<div class="company-logo">
+  <h2>🚗 ESTHETICS AUTO</h2>
+  <p>Professional Cashbook Management System</p>
 </div>
-<div style="margin-top:10px;display:flex;gap:8px;justify-content:space-between;align-items:center;">
-<button class="btn btn-primary" onclick="login()">Login</button>
-<span style="font-size:12px;color:#6b7280;">Welcome to Esthetics Auto Cashbook</span>
+<div class="card-title"><i class="fa-solid fa-right-to-bracket"></i> Login to Dashboard</div>
+<div class="form-row">
+<div class="form-group"><label>Username</label><input autocomplete="username" class="standard-field" id="loginUser" placeholder="Enter your username"/></div>
+<div class="form-group"><label>Password</label><input autocomplete="current-password" class="standard-field" id="loginPass" onkeypress="handleLoginKeyPress(event)" type="password" placeholder="Enter your password"/></div>
+</div>
+<div style="margin-top:20px;display:flex;gap:8px;justify-content:space-between;align-items:center;">
+<button class="btn btn-primary" onclick="login()" style="padding: 12px 24px; font-weight: 600;">
+  <i class="fa-solid fa-sign-in-alt"></i> Login
+</button>
+<div style="text-align:right;">
+  <span style="font-size:12px;color:#6b7280;">Secure Access</span><br>
+  <span style="font-size:11px;color:#9ca3af;">Version 2.0</span>
+</div>
 </div>
 </section>
 <!-- APP -->
@@ -1000,14 +1030,243 @@ header nav button.active {
         }
         
         body {
-            background-color: #f5f7fa;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #333;
             padding: 20px;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Animated Background for Login */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            z-index: -2;
+        }
+        
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><pattern id="cars" x="0" y="0" width="200" height="100" patternUnits="userSpaceOnUse"><g fill="white" fill-opacity="0.05"><rect x="20" y="30" width="60" height="25" rx="12"/><circle cx="35" cy="60" r="8"/><circle cx="65" cy="60" r="8"/><rect x="25" y="20" width="50" height="15" rx="7"/></g></pattern></defs><rect width="100%" height="100%" fill="url(%23cars)"/></svg>');
+            animation: float 20s ease-in-out infinite;
+            z-index: -1;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(1deg); }
+        }
+        
+        /* Cars Animation */
+        .login-cars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .car {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.1);
+            font-size: 24px;
+            animation: moveCar 20s linear infinite;
+        }
+        
+        .car:nth-child(1) { top: 20%; animation-delay: 0s; animation-duration: 25s; }
+        .car:nth-child(2) { top: 40%; animation-delay: -5s; animation-duration: 30s; }
+        .car:nth-child(3) { top: 60%; animation-delay: -10s; animation-duration: 20s; }
+        .car:nth-child(4) { top: 80%; animation-delay: -15s; animation-duration: 35s; }
+        
+        @keyframes moveCar {
+            0% { left: -100px; }
+            100% { left: calc(100% + 100px); }
+        }
+        
+        /* Login Screen Enhancements */
+        #loginScreen {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            border-radius: 20px !important;
+            position: relative;
+            z-index: 1;
+        }
+        
+        #loginScreen::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c);
+            border-radius: 22px;
+            z-index: -1;
+            animation: borderGlow 3s ease-in-out infinite alternate;
+        }
+        
+        @keyframes borderGlow {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        /* Company Logo Animation */
+        .company-logo {
+            text-align: center;
+            margin-bottom: 20px;
+            animation: logoFloat 3s ease-in-out infinite;
+        }
+        
+        .company-logo h2 {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 28px;
+            font-weight: bold;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .company-logo p {
+            color: #666;
+            font-size: 14px;
+            margin: 5px 0 0 0;
+        }
+        
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        /* Enhanced Login Form Styling */
+        #loginScreen .form-group input {
+            background: rgba(255, 255, 255, 0.9) !important;
+            border: 2px solid rgba(255, 255, 255, 0.3) !important;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            padding: 12px 15px !important;
+        }
+        
+        #loginScreen .form-group input:focus {
+            background: rgba(255, 255, 255, 1) !important;
+            border-color: #667eea !important;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        #loginScreen .form-group label {
+            color: #444 !important;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        #loginScreen .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2) !important;
+            border: none !important;
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        #loginScreen .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        /* Welcome message styling */
+        #loginScreen .card-title {
+            color: #444 !important;
+            font-size: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        /* Floating particles effect */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: floatParticle 6s ease-in-out infinite;
+        }
+        
+        .particle:nth-child(1) { width: 4px; height: 4px; left: 10%; animation-delay: 0s; }
+        .particle:nth-child(2) { width: 6px; height: 6px; left: 20%; animation-delay: -1s; }
+        .particle:nth-child(3) { width: 3px; height: 3px; left: 30%; animation-delay: -2s; }
+        .particle:nth-child(4) { width: 5px; height: 5px; left: 40%; animation-delay: -3s; }
+        .particle:nth-child(5) { width: 4px; height: 4px; left: 50%; animation-delay: -4s; }
+        .particle:nth-child(6) { width: 6px; height: 6px; left: 60%; animation-delay: -5s; }
+        .particle:nth-child(7) { width: 3px; height: 3px; left: 70%; animation-delay: -1.5s; }
+        .particle:nth-child(8) { width: 5px; height: 5px; left: 80%; animation-delay: -2.5s; }
+        .particle:nth-child(9) { width: 4px; height: 4px; left: 90%; animation-delay: -3.5s; }
+        
+        @keyframes floatParticle {
+            0%, 100% { 
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10%, 90% { 
+                opacity: 1;
+            }
+            50% { 
+                transform: translateY(-100px) rotate(180deg);
+                opacity: 1;
+            }
         }
         
         .container {
             max-width: 1600px;
             margin: 0 auto;
+        }
+        
+        /* App Background when logged in */
+        #app {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+        }
+        
+        /* Hide animated background when app is visible */
+        body:has(#app:not(.hidden)) {
+            background: #f5f7fa;
+        }
+        
+        body:has(#app:not(.hidden))::before,
+        body:has(#app:not(.hidden))::after,
+        body:has(#app:not(.hidden)) .login-cars {
+            display: none;
         }
         
         header {
